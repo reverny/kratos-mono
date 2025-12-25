@@ -1,9 +1,10 @@
-.PHONY: all api build test clean lint help wire run-inventory
+.PHONY: all api build test clean lint help wire run-inventory swagger
 
 # Variables
-SERVICES := inventory user
+SERVICES := inventory user product
 ROOT_DIR := $(shell pwd)
 API_PROTO_FILES := $(shell find api -name "*.proto")
+SWAGGER_PORT := 8080
 
 help: ## Show this help message
 	@echo 'Usage:'
@@ -68,6 +69,20 @@ run-%: ## Run a specific service (e.g., make run-inventory)
 stop-%: ## Stop a specific service (e.g., make stop-inventory)
 	@echo "Stopping $* service..."
 	@pkill -f "$*.*-conf" || true
+
+# ===== Swagger/OpenAPI =====
+.PHONY: swagger swagger-serve
+swagger: api ## Generate and serve Swagger UI documentation
+	@echo "Opening Swagger UI..."
+	@echo "Swagger UI available at: http://localhost:$(SWAGGER_PORT)"
+	@open http://localhost:$(SWAGGER_PORT)/docs/swagger/ || true
+	@cd docs/swagger && python3 -m http.server $(SWAGGER_PORT)
+
+swagger-serve: ## Serve Swagger UI without regenerating
+	@echo "Starting Swagger UI server on port $(SWAGGER_PORT)..."
+	@echo "Swagger UI available at: http://localhost:$(SWAGGER_PORT)/docs/swagger/"
+	@open http://localhost:$(SWAGGER_PORT)/docs/swagger/ || true
+	@cd docs/swagger && python3 -m http.server $(SWAGGER_PORT)
 
 # ===== Test =====
 .PHONY: test test-coverage

@@ -20,3 +20,6 @@ plugins:
       - paths=source_relative
   - local: protoc-gen-openapi
     out: gen/openapi
+    opt:
+      - naming=proto
+      - depth=2

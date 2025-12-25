@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kratos Mono - API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #swagger-ui {
+            max-width: 1460px;
+            margin: 0 auto;
+        }
+        .topbar {
+            display: none;
+        }
+        .service-selector {
+            padding: 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        .service-selector select {
+            padding: 10px 15px;
+            font-size: 14px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            min-width: 200px;
+        }
+        .service-selector label {
+            margin-right: 10px;
+            font-weight: 600;
+            color: #3b4151;
+        }
+    </style>
+</head>
+<body>
+    <div class="service-selector">
+        <label for="service-select">Select Service:</label>
+        <select id="service-select" onchange="changeService()">
+            <option value="all">All Services</option>
+            <option value="inventory">Inventory Service (8000)</option>
+            <option value="user">User Service (8001)</option>
+            <option value="product">Product Service (8002)</option>
+        </select>
+    </div>
+    <div id="swagger-ui"></div>
+    
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+    <script>
+        const specs = {
+            all: {
+                openapi: '3.0.3',
+                info: {
+                    title: 'Kratos Mono - All Services',
+                    version: '1.0.0',
+                    description: 'API documentation for all microservices in the Kratos mono-repo'
+                },
+                servers: [
+                    { url: 'http://localhost:8000', description: 'Inventory Service' },
+                    { url: 'http://localhost:8001', description: 'User Service' },
+                    { url: 'http://localhost:8002', description: 'Product Service' }
+                ],
+                tags: [
+                    { name: 'Inventory', description: 'Inventory management endpoints' },
+                    { name: 'User', description: 'User management and authentication endpoints' },
+                    { name: 'Product', description: 'Product management endpoints' }
+                ],
+                paths: {
+                    '/api/v1/inventory': {
+                        get: {
+                            tags: ['Inventory'],
+                            summary: 'List products',
+                            operationId: 'ListProducts',
+                            parameters: [
+                                { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+                                { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/ListProductsReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        post: {
+                            tags: ['Inventory'],
+                            summary: 'Create product',
+                            operationId: 'CreateProduct',
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/CreateProductRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/CreateProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/inventory/{id}': {
+                        get: {
+                            tags: ['Inventory'],
+                            summary: 'Get product',
+                            operationId: 'GetProduct',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/GetProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        put: {
+                            tags: ['Inventory'],
+                            summary: 'Update product',
+                            operationId: 'UpdateProduct',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/UpdateProductRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        delete: {
+                            tags: ['Inventory'],
+                            summary: 'Delete product',
+                            operationId: 'DeleteProduct',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/DeleteProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/inventory/{id}/stock': {
+                        put: {
+                            tags: ['Inventory'],
+                            summary: 'Update product stock',
+                            operationId: 'UpdateStock',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/UpdateStockRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateStockReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/user': {
+                        get: {
+                            tags: ['User'],
+                            summary: 'List users',
+                            operationId: 'ListUsers',
+                            parameters: [
+                                { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+                                { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/ListUsersReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        post: {
+                            tags: ['User'],
+                            summary: 'Create user',
+                            operationId: 'CreateUser',
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/CreateUserRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/CreateUserReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/user/{id}': {
+                        get: {
+                            tags: ['User'],
+                            summary: 'Get user',
+                            operationId: 'GetUser',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/GetUserReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        put: {
+                            tags: ['User'],
+                            summary: 'Update user',
+                            operationId: 'UpdateUser',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/UpdateUserRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateUserReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        delete: {
+                            tags: ['User'],
+                            summary: 'Delete user',
+                            operationId: 'DeleteUser',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/DeleteUserReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/user/login': {
+                        post: {
+                            tags: ['User'],
+                            summary: 'User login',
+                            operationId: 'Login',
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/LoginRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/LoginReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/product': {
+                        get: {
+                            tags: ['Product'],
+                            summary: 'List products',
+                            operationId: 'ListProduct',
+                            parameters: [
+                                { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+                                { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/ListProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        post: {
+                            tags: ['Product'],
+                            summary: 'Create product',
+                            operationId: 'CreateProduct',
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/CreateProductRequestV2' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/CreateProductReplyV2' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/product/{id}': {
+                        get: {
+                            tags: ['Product'],
+                            summary: 'Get product',
+                            operationId: 'GetProductV2',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/GetProductReplyV2' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        put: {
+                            tags: ['Product'],
+                            summary: 'Update product',
+                            operationId: 'UpdateProductV2',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/UpdateProductRequestV2' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateProductReplyV2' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        delete: {
+                            tags: ['Product'],
+                            summary: 'Delete product',
+                            operationId: 'DeleteProductV2',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/DeleteProductReplyV2' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                components: {
+                    schemas: {
+                        ProductItem: {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'integer', format: 'int64' },
+                                name: { type: 'string' },
+                                description: { type: 'string' },
+                                price: { type: 'number', format: 'double' },
+                                stock: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        CreateProductRequest: {
+                            type: 'object',
+                            required: ['name'],
+                            properties: {
+                                name: { type: 'string' },
+                                description: { type: 'string' },
+                                price: { type: 'number', format: 'double' },
+                                stock: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        CreateProductReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        },
+                        GetProductReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        },
+                        ListProductsReply: {
+                            type: 'object',
+                            properties: {
+                                items: {
+                                    type: 'array',
+                                    items: { $ref: '#/components/schemas/ProductItem' }
+                                },
+                                total: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        UpdateProductRequest: {
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string' },
+                                description: { type: 'string' },
+                                price: { type: 'number', format: 'double' }
+                            }
+                        },
+                        UpdateProductReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        },
+                        DeleteProductReply: {
+                            type: 'object',
+                            properties: {
+                                success: { type: 'boolean' }
+                            }
+                        },
+                        UpdateStockRequest: {
+                            type: 'object',
+                            required: ['quantity'],
+                            properties: {
+                                quantity: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        UpdateStockReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        },
+                        UserInfo: {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'integer', format: 'int64' },
+                                username: { type: 'string' },
+                                email: { type: 'string' },
+                                full_name: { type: 'string' }
+                            }
+                        },
+                        CreateUserRequest: {
+                            type: 'object',
+                            required: ['username', 'email', 'password'],
+                            properties: {
+                                username: { type: 'string' },
+                                email: { type: 'string', format: 'email' },
+                                password: { type: 'string', format: 'password' },
+                                full_name: { type: 'string' }
+                            }
+                        },
+                        CreateUserReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/UserInfo' }
+                            }
+                        },
+                        GetUserReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/UserInfo' }
+                            }
+                        },
+                        ListUsersReply: {
+                            type: 'object',
+                            properties: {
+                                items: {
+                                    type: 'array',
+                                    items: { $ref: '#/components/schemas/UserInfo' }
+                                },
+                                total: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        UpdateUserRequest: {
+                            type: 'object',
+                            properties: {
+                                email: { type: 'string', format: 'email' },
+                                full_name: { type: 'string' }
+                            }
+                        },
+                        UpdateUserReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/UserInfo' }
+                            }
+                        },
+                        DeleteUserReply: {
+                            type: 'object',
+                            properties: {
+                                success: { type: 'boolean' }
+                            }
+                        },
+                        LoginRequest: {
+                            type: 'object',
+                            required: ['username', 'password'],
+                            properties: {
+                                username: { type: 'string' },
+                                password: { type: 'string', format: 'password' }
+                            }
+                        },
+                        LoginReply: {
+                            type: 'object',
+                            properties: {
+                                token: { type: 'string', description: 'JWT access token' },
+                                user: { $ref: '#/components/schemas/UserInfo' }
+                            }
+                        },
+                        ProductItemV2: {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'integer', format: 'int64' },
+                                name: { type: 'string' }
+                            }
+                        },
+                        CreateProductRequestV2: {
+                            type: 'object',
+                            required: ['name'],
+                            properties: {
+                                name: { type: 'string' }
+                            }
+                        },
+                        CreateProductReplyV2: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItemV2' }
+                            }
+                        },
+                        GetProductReplyV2: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItemV2' }
+                            }
+                        },
+                        ListProductReply: {
+                            type: 'object',
+                            properties: {
+                                items: {
+                                    type: 'array',
+                                    items: { $ref: '#/components/schemas/ProductItemV2' }
+                                },
+                                total: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        UpdateProductRequestV2: {
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string' }
+                            }
+                        },
+                        UpdateProductReplyV2: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItemV2' }
+                            }
+                        },
+                        DeleteProductReplyV2: {
+                            type: 'object',
+                            properties: {
+                                success: { type: 'boolean' }
+                            }
+                        }
+                    }
+                }
+            },
+            inventory: {
+                openapi: '3.0.3',
+                info: {
+                    title: 'Inventory Service API',
+                    version: '1.0.0',
+                    description: 'Product inventory management API'
+                },
+                servers: [
+                    { url: 'http://localhost:8000', description: 'Inventory Service' }
+                ],
+                paths: {
+                    '/api/v1/inventory': {
+                        get: {
+                            summary: 'List products',
+                            operationId: 'ListProducts',
+                            parameters: [
+                                { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+                                { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/ListProductsReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        post: {
+                            summary: 'Create product',
+                            operationId: 'CreateProduct',
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/CreateProductRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/CreateProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/inventory/{id}': {
+                        get: {
+                            summary: 'Get product',
+                            operationId: 'GetProduct',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/GetProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        put: {
+                            summary: 'Update product',
+                            operationId: 'UpdateProduct',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/UpdateProductRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        delete: {
+                            summary: 'Delete product',
+                            operationId: 'DeleteProduct',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/DeleteProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/inventory/{id}/stock': {
+                        put: {
+                            summary: 'Update product stock',
+                            operationId: 'UpdateStock',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/UpdateStockRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateStockReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                components: {
+                    schemas: {
+                        ProductItem: {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'integer', format: 'int64' },
+                                name: { type: 'string' },
+                                description: { type: 'string' },
+                                price: { type: 'number', format: 'double' },
+                                stock: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        CreateProductRequest: {
+                            type: 'object',
+                            required: ['name'],
+                            properties: {
+                                name: { type: 'string' },
+                                description: { type: 'string' },
+                                price: { type: 'number', format: 'double' },
+                                stock: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        CreateProductReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        },
+                        GetProductReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        },
+                        ListProductsReply: {
+                            type: 'object',
+                            properties: {
+                                items: {
+                                    type: 'array',
+                                    items: { $ref: '#/components/schemas/ProductItem' }
+                                },
+                                total: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        UpdateProductRequest: {
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string' },
+                                description: { type: 'string' },
+                                price: { type: 'number', format: 'double' }
+                            }
+                        },
+                        UpdateProductReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        },
+                        DeleteProductReply: {
+                            type: 'object',
+                            properties: {
+                                success: { type: 'boolean' }
+                            }
+                        },
+                        UpdateStockRequest: {
+                            type: 'object',
+                            required: ['quantity'],
+                            properties: {
+                                quantity: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        UpdateStockReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        }
+                    }
+                }
+            },
+            user: {
+                openapi: '3.0.3',
+                info: {
+                    title: 'User Service API',
+                    version: '1.0.0',
+                    description: 'User management and authentication API'
+                },
+                servers: [
+                    { url: 'http://localhost:8001', description: 'User Service' }
+                ],
+                paths: {
+                    '/api/v1/user': {
+                        get: {
+                            summary: 'List users',
+                            operationId: 'ListUsers',
+                            parameters: [
+                                { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+                                { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/ListUsersReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        post: {
+                            summary: 'Create user',
+                            operationId: 'CreateUser',
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/CreateUserRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/CreateUserReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/user/{id}': {
+                        get: {
+                            summary: 'Get user',
+                            operationId: 'GetUser',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/GetUserReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        put: {
+                            summary: 'Update user',
+                            operationId: 'UpdateUser',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/UpdateUserRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateUserReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        delete: {
+                            summary: 'Delete user',
+                            operationId: 'DeleteUser',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/DeleteUserReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/user/login': {
+                        post: {
+                            summary: 'User login',
+                            operationId: 'Login',
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/LoginRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/LoginReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                components: {
+                    schemas: {
+                        UserInfo: {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'integer', format: 'int64' },
+                                username: { type: 'string' },
+                                email: { type: 'string' },
+                                full_name: { type: 'string' }
+                            }
+                        },
+                        CreateUserRequest: {
+                            type: 'object',
+                            required: ['username', 'email', 'password'],
+                            properties: {
+                                username: { type: 'string' },
+                                email: { type: 'string', format: 'email' },
+                                password: { type: 'string', format: 'password' },
+                                full_name: { type: 'string' }
+                            }
+                        },
+                        CreateUserReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/UserInfo' }
+                            }
+                        },
+                        GetUserReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/UserInfo' }
+                            }
+                        },
+                        ListUsersReply: {
+                            type: 'object',
+                            properties: {
+                                items: {
+                                    type: 'array',
+                                    items: { $ref: '#/components/schemas/UserInfo' }
+                                },
+                                total: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        UpdateUserRequest: {
+                            type: 'object',
+                            properties: {
+                                email: { type: 'string', format: 'email' },
+                                full_name: { type: 'string' }
+                            }
+                        },
+                        UpdateUserReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/UserInfo' }
+                            }
+                        },
+                        DeleteUserReply: {
+                            type: 'object',
+                            properties: {
+                                success: { type: 'boolean' }
+                            }
+                        },
+                        LoginRequest: {
+                            type: 'object',
+                            required: ['username', 'password'],
+                            properties: {
+                                username: { type: 'string' },
+                                password: { type: 'string', format: 'password' }
+                            }
+                        },
+                        LoginReply: {
+                            type: 'object',
+                            properties: {
+                                token: { type: 'string', description: 'JWT access token' },
+                                user: { $ref: '#/components/schemas/UserInfo' }
+                            }
+                        }
+                    }
+                }
+            },
+            product: {
+                openapi: '3.0.3',
+                info: {
+                    title: 'Product Service API',
+                    version: '1.0.0',
+                    description: 'Product management API'
+                },
+                servers: [
+                    { url: 'http://localhost:8002', description: 'Product Service' }
+                ],
+                paths: {
+                    '/api/v1/product': {
+                        get: {
+                            summary: 'List products',
+                            operationId: 'ListProduct',
+                            parameters: [
+                                { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+                                { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/ListProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        post: {
+                            summary: 'Create product',
+                            operationId: 'CreateProduct',
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/CreateProductRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/CreateProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    '/api/v1/product/{id}': {
+                        get: {
+                            summary: 'Get product',
+                            operationId: 'GetProduct',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/GetProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        put: {
+                            summary: 'Update product',
+                            operationId: 'UpdateProduct',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    'application/json': {
+                                        schema: { $ref: '#/components/schemas/UpdateProductRequest' }
+                                    }
+                                }
+                            },
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        delete: {
+                            summary: 'Delete product',
+                            operationId: 'DeleteProduct',
+                            parameters: [
+                                { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                            ],
+                            responses: {
+                                '200': {
+                                    description: 'Success',
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/DeleteProductReply' }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                components: {
+                    schemas: {
+                        ProductItem: {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'integer', format: 'int64' },
+                                name: { type: 'string' }
+                            }
+                        },
+                        CreateProductRequest: {
+                            type: 'object',
+                            required: ['name'],
+                            properties: {
+                                name: { type: 'string' }
+                            }
+                        },
+                        CreateProductReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        },
+                        GetProductReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        },
+                        ListProductReply: {
+                            type: 'object',
+                            properties: {
+                                items: {
+                                    type: 'array',
+                                    items: { $ref: '#/components/schemas/ProductItem' }
+                                },
+                                total: { type: 'integer', format: 'int32' }
+                            }
+                        },
+                        UpdateProductRequest: {
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string' }
+                            }
+                        },
+                        UpdateProductReply: {
+                            type: 'object',
+                            properties: {
+                                data: { $ref: '#/components/schemas/ProductItem' }
+                            }
+                        },
+                        DeleteProductReply: {
+                            type: 'object',
+                            properties: {
+                                success: { type: 'boolean' }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        let ui = null;
+
+        function changeService() {
+            const select = document.getElementById('service-select');
+            const service = select.value;
+            
+            if (ui) {
+                ui.specActions.updateSpec(JSON.stringify(specs[service]));
+            } else {
+                initSwagger(service);
+            }
+        }
+
+        function initSwagger(service = 'all') {
+            ui = SwaggerUIBundle({
+                spec: specs[service],
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+            });
+        }
+
+        // Initialize with all services
+        window.onload = function() {
+            initSwagger('all');
+        };
+    </script>
+</body>
+</html>
