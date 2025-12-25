@@ -382,14 +382,20 @@ cat > "${SERVICE_DIR}/internal/server/http.go" <<EOF
 package server
 
 import (
+	_ "embed"
+	nethttp "net/http"
+
 	v1 "github.com/reverny/kratos-mono/gen/go/api/${SERVICE_NAME}/v1"
 	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/conf"
 	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/service"
 
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-kratos/kratos/v2/middleware/recovery"
-	"github.com/go-kratos/kratos/v2/transport/http"
+\t"github.com/go-kratos/kratos/v2/log"
+\t"github.com/go-kratos/kratos/v2/middleware/recovery"
+\t"github.com/go-kratos/kratos/v2/transport/http"
 )
+
+//go:embed swagger.html
+var swaggerHTML []byte
 
 func NewHTTPServer(c *conf.Server, ${SERVICE_NAME}Svc *service.${SERVICE_NAME_UPPER}Service, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
@@ -408,6 +414,13 @@ func NewHTTPServer(c *conf.Server, ${SERVICE_NAME}Svc *service.${SERVICE_NAME_UP
 	}
 	srv := http.NewServer(opts...)
 	v1.Register${SERVICE_NAME_UPPER}HTTPServer(srv, ${SERVICE_NAME}Svc)
+	
+	// Serve Swagger UI
+	srv.HandleFunc("/docs", func(w nethttp.ResponseWriter, r *nethttp.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Write(swaggerHTML)
+	})
+	
 	return srv
 }
 EOF
@@ -513,7 +526,245 @@ func (s *${SERVICE_NAME_UPPER}Service) Delete${SERVICE_NAME_UPPER}(ctx context.C
 }
 EOF
 
-# Create biz.go
+# Create Swagger UI HTML
+cat > "${SERVICE_DIR}/docs/swagger.html" <<'SWAGGEREOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SERVICENAME Service API</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css">
+    <style>
+        body { margin: 0; padding: 0; }
+        #swagger-ui { max-width: 1460px; margin: 0 auto; }
+        .topbar { display: none; }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            SwaggerUIBundle({
+                spec: {
+                    openapi: '3.0.3',
+                    info: {
+                        title: 'SERVICENAME Service API',
+                        version: '1.0.0',
+                        description: 'SERVICENAME service API documentation'
+                    },
+                    servers: [
+                        { url: window.location.origin, description: 'Current Server' }
+                    ],
+                    paths: {
+                        '/api/v1/SERVICENAME': {
+                            get: {
+                                tags: ['SERVICENAME'],
+                                summary: 'List items',
+                                operationId: 'ListSERVICENAME',
+                                parameters: [
+                                    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+                                    { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
+                                ],
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/ListSERVICENAMEReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            post: {
+                                tags: ['SERVICENAME'],
+                                summary: 'Create item',
+                                operationId: 'CreateSERVICENAME',
+                                requestBody: {
+                                    required: true,
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/CreateSERVICENAMERequest' }
+                                        }
+                                    }
+                                },
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/CreateSERVICENAMEReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        '/api/v1/SERVICENAME/{id}': {
+                            get: {
+                                tags: ['SERVICENAME'],
+                                summary: 'Get item',
+                                operationId: 'GetSERVICENAME',
+                                parameters: [
+                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                                ],
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/GetSERVICENAMEReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            put: {
+                                tags: ['SERVICENAME'],
+                                summary: 'Update item',
+                                operationId: 'UpdateSERVICENAME',
+                                parameters: [
+                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                                ],
+                                requestBody: {
+                                    required: true,
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateSERVICENAMERequest' }
+                                        }
+                                    }
+                                },
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/UpdateSERVICENAMEReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            delete: {
+                                tags: ['SERVICENAME'],
+                                summary: 'Delete item',
+                                operationId: 'DeleteSERVICENAME',
+                                parameters: [
+                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                                ],
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/DeleteSERVICENAMEReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    components: {
+                        schemas: {
+                            SERVICENAMEItem: {
+                                type: 'object',
+                                properties: {
+                                    id: { type: 'integer', format: 'int64' },
+                                    name: { type: 'string' }
+                                }
+                            },
+                            CreateSERVICENAMERequest: {
+                                type: 'object',
+                                required: ['name'],
+                                properties: {
+                                    name: { type: 'string' }
+                                }
+                            },
+                            CreateSERVICENAMEReply: {
+                                type: 'object',
+                                properties: {
+                                    data: { $ref: '#/components/schemas/SERVICENAMEItem' }
+                                }
+                            },
+                            GetSERVICENAMEReply: {
+                                type: 'object',
+                                properties: {
+                                    data: { $ref: '#/components/schemas/SERVICENAMEItem' }
+                                }
+                            },
+                            ListSERVICENAMEReply: {
+                                type: 'object',
+                                properties: {
+                                    items: {
+                                        type: 'array',
+                                        items: { $ref: '#/components/schemas/SERVICENAMEItem' }
+                                    },
+                                    total: { type: 'integer', format: 'int32' }
+                                }
+                            },
+                            UpdateSERVICENAMERequest: {
+                                type: 'object',
+                                properties: {
+                                    name: { type: 'string' }
+                                }
+                            },
+                            UpdateSERVICENAMEReply: {
+                                type: 'object',
+                                properties: {
+                                    data: { $ref: '#/components/schemas/SERVICENAMEItem' }
+                                }
+                            },
+                            DeleteSERVICENAMEReply: {
+                                type: 'object',
+                                properties: {
+                                    success: { type: 'boolean' }
+                                }
+                            }
+                        },
+                        securitySchemes: {
+                            BearerAuth: {
+                                type: 'http',
+                                scheme: 'bearer',
+                                bearerFormat: 'JWT',
+                                description: 'Enter your Bearer token in the format: Bearer <token>'
+                            }
+                        }
+                    },
+                    security: [
+                        {
+                            BearerAuth: []
+                        }
+                    ]
+                },
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+            });
+        };
+    </script>
+</body>
+</html>
+SWAGGEREOF
+
+# Replace SERVICENAME with actual service name (uppercase first letter)
+sed -i.bak "s/SERVICENAME/${SERVICE_NAME_UPPER}/g" "${SERVICE_DIR}/docs/swagger.html"
+rm "${SERVICE_DIR}/docs/swagger.html.bak"
+
+# Copy swagger.html to internal/server for embedding
+cp "${SERVICE_DIR}/docs/swagger.html" "${SERVICE_DIR}/internal/server/swagger.html"
+
+# Create main.go
 cat > "${SERVICE_DIR}/internal/biz/biz.go" <<EOF
 package biz
 

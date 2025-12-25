@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Service API</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css">
+    <style>
+        body { margin: 0; padding: 0; }
+        #swagger-ui { max-width: 1460px; margin: 0 auto; }
+        .topbar { display: none; }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            SwaggerUIBundle({
+                spec: {
+                    openapi: '3.0.3',
+                    info: {
+                        title: 'User Service API',
+                        version: '1.0.0',
+                        description: 'User management and authentication API'
+                    },
+                    servers: [
+                        { url: window.location.origin, description: 'Current Server' }
+                    ],
+                    paths: {
+                        '/api/v1/user': {
+                            get: {
+                                tags: ['User'],
+                                summary: 'List users',
+                                operationId: 'ListUsers',
+                                parameters: [
+                                    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+                                    { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
+                                ],
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/ListUsersReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            post: {
+                                tags: ['User'],
+                                summary: 'Create user',
+                                operationId: 'CreateUser',
+                                requestBody: {
+                                    required: true,
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/CreateUserRequest' }
+                                        }
+                                    }
+                                },
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/CreateUserReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        '/api/v1/user/{id}': {
+                            get: {
+                                tags: ['User'],
+                                summary: 'Get user',
+                                operationId: 'GetUser',
+                                parameters: [
+                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                                ],
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/GetUserReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            put: {
+                                tags: ['User'],
+                                summary: 'Update user',
+                                operationId: 'UpdateUser',
+                                parameters: [
+                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                                ],
+                                requestBody: {
+                                    required: true,
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateUserRequest' }
+                                        }
+                                    }
+                                },
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/UpdateUserReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            delete: {
+                                tags: ['User'],
+                                summary: 'Delete user',
+                                operationId: 'DeleteUser',
+                                parameters: [
+                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                                ],
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/DeleteUserReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        '/api/v1/user/login': {
+                            post: {
+                                tags: ['User'],
+                                summary: 'User login',
+                                operationId: 'Login',
+                                requestBody: {
+                                    required: true,
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/LoginRequest' }
+                                        }
+                                    }
+                                },
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/LoginReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    components: {
+                        schemas: {
+                            UserInfo: {
+                                type: 'object',
+                                properties: {
+                                    id: { type: 'integer', format: 'int64' },
+                                    username: { type: 'string' },
+                                    email: { type: 'string' },
+                                    full_name: { type: 'string' }
+                                }
+                            },
+                            CreateUserRequest: {
+                                type: 'object',
+                                required: ['username', 'email', 'password'],
+                                properties: {
+                                    username: { type: 'string' },
+                                    email: { type: 'string', format: 'email' },
+                                    password: { type: 'string', format: 'password' },
+                                    full_name: { type: 'string' }
+                                }
+                            },
+                            CreateUserReply: {
+                                type: 'object',
+                                properties: {
+                                    data: { $ref: '#/components/schemas/UserInfo' }
+                                }
+                            },
+                            GetUserReply: {
+                                type: 'object',
+                                properties: {
+                                    data: { $ref: '#/components/schemas/UserInfo' }
+                                }
+                            },
+                            ListUsersReply: {
+                                type: 'object',
+                                properties: {
+                                    items: {
+                                        type: 'array',
+                                        items: { $ref: '#/components/schemas/UserInfo' }
+                                    },
+                                    total: { type: 'integer', format: 'int32' }
+                                }
+                            },
+                            UpdateUserRequest: {
+                                type: 'object',
+                                properties: {
+                                    email: { type: 'string', format: 'email' },
+                                    full_name: { type: 'string' }
+                                }
+                            },
+                            UpdateUserReply: {
+                                type: 'object',
+                                properties: {
+                                    data: { $ref: '#/components/schemas/UserInfo' }
+                                }
+                            },
+                            DeleteUserReply: {
+                                type: 'object',
+                                properties: {
+                                    success: { type: 'boolean' }
+                                }
+                            },
+                            LoginRequest: {
+                                type: 'object',
+                                required: ['username', 'password'],
+                                properties: {
+                                    username: { type: 'string' },
+                                    password: { type: 'string', format: 'password' }
+                                }
+                            },
+                            LoginReply: {
+                                type: 'object',
+                                properties: {
+                                    token: { type: 'string', description: 'JWT access token' },
+                                    user: { $ref: '#/components/schemas/UserInfo' }
+                                }
+                            }
+                        }
+                    }
+                },
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+            });
+        };
+    </script>
+</body>
+</html>
