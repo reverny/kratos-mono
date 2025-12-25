@@ -1,4 +1,4 @@
-module github.com/reverny/kratos-mono/services/inventory
+module github.com/reverny/kratos-mono/services/user
 
 go 1.23
 

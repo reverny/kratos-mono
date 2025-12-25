@@ -3,19 +3,19 @@ managed:
   enabled: false
 plugins:
   - remote: buf.build/protocolbuffers/go
-    out: gen/go
+    out: gen/go/api
     opt:
       - paths=source_relative
   - remote: buf.build/grpc/go
-    out: gen/go
+    out: gen/go/api
     opt:
       - paths=source_relative
   - local: protoc-gen-go-http
-    out: gen/go
+    out: gen/go/api
     opt:
       - paths=source_relative
   - local: protoc-gen-go-errors
-    out: gen/go
+    out: gen/go/api
     opt:
       - paths=source_relative
   - local: protoc-gen-openapi

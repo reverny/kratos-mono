@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package api.user.v1;
+
+option go_package = "github.com/reverny/kratos-mono/gen/go/api/user/v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+// User service
+service User {
+  // สร้าง user ใหม่
+  rpc CreateUser (CreateUserRequest) returns (UserInfo) {
+    option (google.api.http) = {
+      post: "/v1/users"
+      body: "*"
+    };
+  }
+
+  // ดึงข้อมูล user
+  rpc GetUser (GetUserRequest) returns (UserInfo) {
+    option (google.api.http) = {
+      get: "/v1/users/{id}"
+    };
+  }
+
+  // ดึงรายการ users ทั้งหมด
+  rpc ListUsers (ListUsersRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      get: "/v1/users"
+    };
+  }
+
+  // อัพเดท user
+  rpc UpdateUser (UpdateUserRequest) returns (UserInfo) {
+    option (google.api.http) = {
+      put: "/v1/users/{id}"
+      body: "*"
+    };
+  }
+
+  // ลบ user
+  rpc DeleteUser (DeleteUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/users/{id}"
+    };
+  }
+
+  // Login
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/login"
+      body: "*"
+    };
+  }
+}
+
+// User model
+message UserInfo {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  string full_name = 4;
+  string avatar_url = 5;
+  string role = 6;
+  string status = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  string full_name = 4;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message ListUsersRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string role = 3;
+  string status = 4;
+}
+
+message ListUsersResponse {
+  repeated UserInfo users = 1;
+  int32 total = 2;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  string email = 2;
+  string full_name = 3;
+  string avatar_url = 4;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+  UserInfo user = 2;
+}
