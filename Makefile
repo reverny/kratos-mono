@@ -1,7 +1,7 @@
 .PHONY: all api build test clean lint help wire run-inventory
 
 # Variables
-SERVICES := inventory
+SERVICES := inventory user
 ROOT_DIR := $(shell pwd)
 API_PROTO_FILES := $(shell find api -name "*.proto")
 
@@ -130,8 +130,16 @@ docker-build-inventory: ## Build docker image for inventory service
 	docker build -t kratos-mono/inventory:latest -f services/inventory/Dockerfile .
 
 # ===== Init =====
-.PHONY: init install-tools
+.PHONY: init install-tools gen-service
 init: install-tools deps ## Initialize project (install tools and dependencies)
+
+gen-service: ## Generate a new service (e.g., make gen-service name=product)
+	@if [ -z "$(name)" ]; then \
+		echo "Error: Please provide service name. Usage: make gen-service name=<service-name>"; \
+		exit 1; \
+	fi
+	@echo "Generating service: $(name)..."
+	@bash scripts/gen-service.sh $(name)
 
 install-tools: ## Install required tools
 	@echo "Installing tools..."
