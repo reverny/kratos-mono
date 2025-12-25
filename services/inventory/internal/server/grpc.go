@@ -1,17 +1,17 @@
 package server
 
 import (
-	v1 "inventory/api/helloworld/v1"
-	"inventory/internal/conf"
-	"inventory/internal/service"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
+
+	v1 "github.com/reverny/kratos-mono/gen/go/api/inventory/v1"
+	"github.com/reverny/kratos-mono/services/inventory/internal/conf"
+	"github.com/reverny/kratos-mono/services/inventory/internal/service"
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server, inventoryService *service.InventoryService, logger log.Logger) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -27,6 +27,6 @@ func NewGRPCServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	v1.RegisterGreeterServer(srv, greeter)
+	v1.RegisterInventoryServer(srv, inventoryService)
 	return srv
 }

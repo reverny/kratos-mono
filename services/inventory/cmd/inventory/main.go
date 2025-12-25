@@ -4,25 +4,22 @@ import (
 	"flag"
 	"os"
 
-	"inventory/internal/conf"
-
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
-	_ "go.uber.org/automaxprocs"
+	"github.com/reverny/kratos-mono/services/inventory/internal/conf"
 )
 
 // go build -ldflags "-X main.Version=x.y.z"
 var (
 	// Name is the name of the compiled software.
-	Name string
+	Name string = "inventory"
 	// Version is the version of the compiled software.
-	Version string
+	Version string = "v1.0.0"
 	// flagconf is the config flag.
 	flagconf string
 
@@ -55,8 +52,6 @@ func main() {
 		"service.id", id,
 		"service.name", Name,
 		"service.version", Version,
-		"trace.id", tracing.TraceID(),
-		"span.id", tracing.SpanID(),
 	)
 	c := config.New(
 		config.WithSource(

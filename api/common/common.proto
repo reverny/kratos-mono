@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package api.common;
+
+option go_package = "github.com/reverny/kratos-mono/gen/go/api/common;common";
+
+// Common error codes
+enum ErrorCode {
+  UNKNOWN = 0;
+  INVALID_ARGUMENT = 1;
+  NOT_FOUND = 2;
+  ALREADY_EXISTS = 3;
+  PERMISSION_DENIED = 4;
+  INTERNAL = 5;
+}
+
+// Common metadata
+message Metadata {
+  string request_id = 1;
+  string timestamp = 2;
+}
+
+// Pagination
+message Pagination {
+  int32 page = 1;
+  int32 page_size = 2;
+  int32 total = 3;
+}

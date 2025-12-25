@@ -1,24 +1,33 @@
-FROM golang:1.19 AS builder
-
-COPY . /src
-WORKDIR /src
-
-RUN GOPROXY=https://goproxy.cn make build
-
-FROM debian:stable-slim
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-		ca-certificates  \
-        netbase \
-        && rm -rf /var/lib/apt/lists/ \
-        && apt-get autoremove -y && apt-get autoclean -y
-
-COPY --from=builder /src/bin /app
+FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
 
-EXPOSE 8000
-EXPOSE 9000
-VOLUME /data/conf
+# Copy go mod files
+COPY go.mod go.sum ./
+COPY services/inventory/go.mod services/inventory/go.sum ./services/inventory/
 
-CMD ["./server", "-conf", "/data/conf"]
+# Download dependencies
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build
+WORKDIR /app/services/inventory
+RUN CGO_ENABLED=0 GOOS=linux go build -o /inventory ./cmd/inventory
+
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# Copy binary
+COPY --from=builder /inventory .
+
+# Copy configs
+COPY services/inventory/configs ./configs
+
+EXPOSE 8000 9000
+
+CMD ["./inventory", "-conf", "./configs"]

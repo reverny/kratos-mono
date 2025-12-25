@@ -7,32 +7,28 @@
 package main
 
 import (
-	"inventory/internal/biz"
-	"inventory/internal/conf"
-	"inventory/internal/data"
-	"inventory/internal/server"
-	"inventory/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
-)
-
-import (
-	_ "go.uber.org/automaxprocs"
+	"github.com/reverny/kratos-mono/services/inventory/internal/biz"
+	"github.com/reverny/kratos-mono/services/inventory/internal/conf"
+	"github.com/reverny/kratos-mono/services/inventory/internal/data"
+	"github.com/reverny/kratos-mono/services/inventory/internal/server"
+	"github.com/reverny/kratos-mono/services/inventory/internal/service"
 )
 
 // Injectors from wire.go:
 
 // wireApp init kratos application.
 func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData)
+	dataData, cleanup, err := data.NewData(confData, logger)
 	if err != nil {
 		return nil, nil, err
 	}
-	greeterRepo := data.NewGreeterRepo(dataData, logger)
-	greeterUsecase := biz.NewGreeterUsecase(greeterRepo)
-	greeterService := service.NewGreeterService(greeterUsecase)
-	grpcServer := server.NewGRPCServer(confServer, greeterService, logger)
-	httpServer := server.NewHTTPServer(confServer, greeterService, logger)
+	inventoryRepo := data.NewInventoryRepo(dataData, logger)
+	inventoryUsecase := biz.NewInventoryUsecase(inventoryRepo, logger)
+	inventoryService := service.NewInventoryService(inventoryUsecase)
+	grpcServer := server.NewGRPCServer(confServer, inventoryService, logger)
+	httpServer := server.NewHTTPServer(confServer, inventoryService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

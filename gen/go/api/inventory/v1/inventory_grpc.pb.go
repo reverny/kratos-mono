@@ -2,15 +2,16 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             (unknown)
-// source: api/inventory/v1/inventory.proto
+// source: inventory/v1/inventory.proto
 
-package inventoryv1
+package v1
 
 import (
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,14 +20,32 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Inventory_GetItem_FullMethodName = "/inventory.v1.Inventory/GetItem"
+	Inventory_CreateProduct_FullMethodName = "/api.inventory.v1.Inventory/CreateProduct"
+	Inventory_GetProduct_FullMethodName    = "/api.inventory.v1.Inventory/GetProduct"
+	Inventory_ListProducts_FullMethodName  = "/api.inventory.v1.Inventory/ListProducts"
+	Inventory_UpdateProduct_FullMethodName = "/api.inventory.v1.Inventory/UpdateProduct"
+	Inventory_DeleteProduct_FullMethodName = "/api.inventory.v1.Inventory/DeleteProduct"
+	Inventory_UpdateStock_FullMethodName   = "/api.inventory.v1.Inventory/UpdateStock"
 )
 
 // InventoryClient is the client API for Inventory service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// Inventory service
 type InventoryClient interface {
-	GetItem(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemReply, error)
+	// สร้างสินค้าใหม่
+	CreateProduct(ctx context.Context, in *CreateProductRequest, opts ...grpc.CallOption) (*Product, error)
+	// ดึงข้อมูลสินค้า
+	GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*Product, error)
+	// ดึงรายการสินค้าทั้งหมด
+	ListProducts(ctx context.Context, in *ListProductsRequest, opts ...grpc.CallOption) (*ListProductsResponse, error)
+	// อัพเดทสินค้า
+	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*Product, error)
+	// ลบสินค้า
+	DeleteProduct(ctx context.Context, in *DeleteProductRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// อัพเดทจำนวนสต็อก
+	UpdateStock(ctx context.Context, in *UpdateStockRequest, opts ...grpc.CallOption) (*Product, error)
 }
 
 type inventoryClient struct {
@@ -37,10 +56,60 @@ func NewInventoryClient(cc grpc.ClientConnInterface) InventoryClient {
 	return &inventoryClient{cc}
 }
 
-func (c *inventoryClient) GetItem(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemReply, error) {
+func (c *inventoryClient) CreateProduct(ctx context.Context, in *CreateProductRequest, opts ...grpc.CallOption) (*Product, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetItemReply)
-	err := c.cc.Invoke(ctx, Inventory_GetItem_FullMethodName, in, out, cOpts...)
+	out := new(Product)
+	err := c.cc.Invoke(ctx, Inventory_CreateProduct_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inventoryClient) GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*Product, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Product)
+	err := c.cc.Invoke(ctx, Inventory_GetProduct_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inventoryClient) ListProducts(ctx context.Context, in *ListProductsRequest, opts ...grpc.CallOption) (*ListProductsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListProductsResponse)
+	err := c.cc.Invoke(ctx, Inventory_ListProducts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inventoryClient) UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*Product, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Product)
+	err := c.cc.Invoke(ctx, Inventory_UpdateProduct_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inventoryClient) DeleteProduct(ctx context.Context, in *DeleteProductRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Inventory_DeleteProduct_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inventoryClient) UpdateStock(ctx context.Context, in *UpdateStockRequest, opts ...grpc.CallOption) (*Product, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Product)
+	err := c.cc.Invoke(ctx, Inventory_UpdateStock_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +119,21 @@ func (c *inventoryClient) GetItem(ctx context.Context, in *GetItemRequest, opts 
 // InventoryServer is the server API for Inventory service.
 // All implementations must embed UnimplementedInventoryServer
 // for forward compatibility.
+//
+// Inventory service
 type InventoryServer interface {
-	GetItem(context.Context, *GetItemRequest) (*GetItemReply, error)
+	// สร้างสินค้าใหม่
+	CreateProduct(context.Context, *CreateProductRequest) (*Product, error)
+	// ดึงข้อมูลสินค้า
+	GetProduct(context.Context, *GetProductRequest) (*Product, error)
+	// ดึงรายการสินค้าทั้งหมด
+	ListProducts(context.Context, *ListProductsRequest) (*ListProductsResponse, error)
+	// อัพเดทสินค้า
+	UpdateProduct(context.Context, *UpdateProductRequest) (*Product, error)
+	// ลบสินค้า
+	DeleteProduct(context.Context, *DeleteProductRequest) (*emptypb.Empty, error)
+	// อัพเดทจำนวนสต็อก
+	UpdateStock(context.Context, *UpdateStockRequest) (*Product, error)
 	mustEmbedUnimplementedInventoryServer()
 }
 
@@ -62,8 +144,23 @@ type InventoryServer interface {
 // pointer dereference when methods are called.
 type UnimplementedInventoryServer struct{}
 
-func (UnimplementedInventoryServer) GetItem(context.Context, *GetItemRequest) (*GetItemReply, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetItem not implemented")
+func (UnimplementedInventoryServer) CreateProduct(context.Context, *CreateProductRequest) (*Product, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateProduct not implemented")
+}
+func (UnimplementedInventoryServer) GetProduct(context.Context, *GetProductRequest) (*Product, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetProduct not implemented")
+}
+func (UnimplementedInventoryServer) ListProducts(context.Context, *ListProductsRequest) (*ListProductsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListProducts not implemented")
+}
+func (UnimplementedInventoryServer) UpdateProduct(context.Context, *UpdateProductRequest) (*Product, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateProduct not implemented")
+}
+func (UnimplementedInventoryServer) DeleteProduct(context.Context, *DeleteProductRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteProduct not implemented")
+}
+func (UnimplementedInventoryServer) UpdateStock(context.Context, *UpdateStockRequest) (*Product, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateStock not implemented")
 }
 func (UnimplementedInventoryServer) mustEmbedUnimplementedInventoryServer() {}
 func (UnimplementedInventoryServer) testEmbeddedByValue()                   {}
@@ -86,20 +183,110 @@ func RegisterInventoryServer(s grpc.ServiceRegistrar, srv InventoryServer) {
 	s.RegisterService(&Inventory_ServiceDesc, srv)
 }
 
-func _Inventory_GetItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetItemRequest)
+func _Inventory_CreateProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateProductRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(InventoryServer).GetItem(ctx, in)
+		return srv.(InventoryServer).CreateProduct(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Inventory_GetItem_FullMethodName,
+		FullMethod: Inventory_CreateProduct_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InventoryServer).GetItem(ctx, req.(*GetItemRequest))
+		return srv.(InventoryServer).CreateProduct(ctx, req.(*CreateProductRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Inventory_GetProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProductRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InventoryServer).GetProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Inventory_GetProduct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InventoryServer).GetProduct(ctx, req.(*GetProductRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Inventory_ListProducts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListProductsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InventoryServer).ListProducts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Inventory_ListProducts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InventoryServer).ListProducts(ctx, req.(*ListProductsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Inventory_UpdateProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProductRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InventoryServer).UpdateProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Inventory_UpdateProduct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InventoryServer).UpdateProduct(ctx, req.(*UpdateProductRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Inventory_DeleteProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteProductRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InventoryServer).DeleteProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Inventory_DeleteProduct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InventoryServer).DeleteProduct(ctx, req.(*DeleteProductRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Inventory_UpdateStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateStockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InventoryServer).UpdateStock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Inventory_UpdateStock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InventoryServer).UpdateStock(ctx, req.(*UpdateStockRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -108,14 +295,34 @@ func _Inventory_GetItem_Handler(srv interface{}, ctx context.Context, dec func(i
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Inventory_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "inventory.v1.Inventory",
+	ServiceName: "api.inventory.v1.Inventory",
 	HandlerType: (*InventoryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetItem",
-			Handler:    _Inventory_GetItem_Handler,
+			MethodName: "CreateProduct",
+			Handler:    _Inventory_CreateProduct_Handler,
+		},
+		{
+			MethodName: "GetProduct",
+			Handler:    _Inventory_GetProduct_Handler,
+		},
+		{
+			MethodName: "ListProducts",
+			Handler:    _Inventory_ListProducts_Handler,
+		},
+		{
+			MethodName: "UpdateProduct",
+			Handler:    _Inventory_UpdateProduct_Handler,
+		},
+		{
+			MethodName: "DeleteProduct",
+			Handler:    _Inventory_DeleteProduct_Handler,
+		},
+		{
+			MethodName: "UpdateStock",
+			Handler:    _Inventory_UpdateStock_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/inventory/v1/inventory.proto",
+	Metadata: "inventory/v1/inventory.proto",
 }
