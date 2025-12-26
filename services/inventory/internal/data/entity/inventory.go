@@ -2,7 +2,7 @@ package entity
 
 import (
 	"time"
-	
+
 	"github.com/reverny/kratos-mono/services/inventory/internal/dto"
 )
 
