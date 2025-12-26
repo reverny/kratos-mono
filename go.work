@@ -4,5 +4,6 @@ use (
 	.
 	./services/inventory
 	./services/product
+	./services/test
 	./services/user
 )

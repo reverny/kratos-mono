@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Service API</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css">
+    <style>
+        body { margin: 0; padding: 0; }
+        #swagger-ui { max-width: 1460px; margin: 0 auto; }
+        .topbar { display: none; }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            SwaggerUIBundle({
+                spec: {
+                    openapi: '3.0.3',
+                    info: {
+                        title: 'Test Service API',
+                        version: '1.0.0',
+                        description: 'Test service API documentation'
+                    },
+                    servers: [
+                        { url: window.location.origin, description: 'Current Server' }
+                    ],
+                    paths: {
+                        '/api/v1/Test': {
+                            get: {
+                                tags: ['Test'],
+                                summary: 'List items',
+                                operationId: 'ListTest',
+                                parameters: [
+                                    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+                                    { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
+                                ],
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/ListTestReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            post: {
+                                tags: ['Test'],
+                                summary: 'Create item',
+                                operationId: 'CreateTest',
+                                requestBody: {
+                                    required: true,
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/CreateTestRequest' }
+                                        }
+                                    }
+                                },
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/CreateTestReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        '/api/v1/Test/{id}': {
+                            get: {
+                                tags: ['Test'],
+                                summary: 'Get item',
+                                operationId: 'GetTest',
+                                parameters: [
+                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                                ],
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/GetTestReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            put: {
+                                tags: ['Test'],
+                                summary: 'Update item',
+                                operationId: 'UpdateTest',
+                                parameters: [
+                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                                ],
+                                requestBody: {
+                                    required: true,
+                                    content: {
+                                        'application/json': {
+                                            schema: { $ref: '#/components/schemas/UpdateTestRequest' }
+                                        }
+                                    }
+                                },
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/UpdateTestReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            delete: {
+                                tags: ['Test'],
+                                summary: 'Delete item',
+                                operationId: 'DeleteTest',
+                                parameters: [
+                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
+                                ],
+                                responses: {
+                                    '200': {
+                                        description: 'Success',
+                                        content: {
+                                            'application/json': {
+                                                schema: { $ref: '#/components/schemas/DeleteTestReply' }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    components: {
+                        schemas: {
+                            TestItem: {
+                                type: 'object',
+                                properties: {
+                                    id: { type: 'integer', format: 'int64' },
+                                    name: { type: 'string' }
+                                }
+                            },
+                            CreateTestRequest: {
+                                type: 'object',
+                                required: ['name'],
+                                properties: {
+                                    name: { type: 'string' }
+                                }
+                            },
+                            CreateTestReply: {
+                                type: 'object',
+                                properties: {
+                                    data: { $ref: '#/components/schemas/TestItem' }
+                                }
+                            },
+                            GetTestReply: {
+                                type: 'object',
+                                properties: {
+                                    data: { $ref: '#/components/schemas/TestItem' }
+                                }
+                            },
+                            ListTestReply: {
+                                type: 'object',
+                                properties: {
+                                    items: {
+                                        type: 'array',
+                                        items: { $ref: '#/components/schemas/TestItem' }
+                                    },
+                                    total: { type: 'integer', format: 'int32' }
+                                }
+                            },
+                            UpdateTestRequest: {
+                                type: 'object',
+                                properties: {
+                                    name: { type: 'string' }
+                                }
+                            },
+                            UpdateTestReply: {
+                                type: 'object',
+                                properties: {
+                                    data: { $ref: '#/components/schemas/TestItem' }
+                                }
+                            },
+                            DeleteTestReply: {
+                                type: 'object',
+                                properties: {
+                                    success: { type: 'boolean' }
+                                }
+                            }
+                        },
+                        securitySchemes: {
+                            BearerAuth: {
+                                type: 'http',
+                                scheme: 'bearer',
+                                bearerFormat: 'JWT',
+                                description: 'Enter your Bearer token in the format: Bearer <token>'
+                            }
+                        }
+                    },
+                    security: [
+                        {
+                            BearerAuth: []
+                        }
+                    ]
+                },
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+            });
+        };
+    </script>
+</body>
+</html>

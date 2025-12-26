@@ -8,8 +8,9 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 
-	v1 "github.com/reverny/kratos-mono/gen/go/api/inventory/v1"
 	"github.com/reverny/kratos-mono/services/inventory/internal/biz"
+	"github.com/reverny/kratos-mono/services/inventory/internal/data/entity"
+	"github.com/reverny/kratos-mono/services/inventory/internal/dto"
 )
 
 type inventoryRepo struct {
@@ -25,115 +26,153 @@ func NewInventoryRepo(data *Data, logger log.Logger) biz.InventoryRepo {
 	}
 }
 
-func (r *inventoryRepo) CreateProduct(ctx context.Context, req *v1.CreateProductRequest) (*v1.Product, error) {
-	now := time.Now().Format(time.RFC3339)
-	product := &v1.Product{
-		Id:          uuid.New().String(),
+func (r *inventoryRepo) CreateProduct(ctx context.Context, req *dto.CreateProductDTO) (*dto.ProductDTO, error) {
+	now := time.Now()
+	
+	// Create entity from DTO
+	productEntity := &entity.Product{
+		ID:          uuid.New().String(),
 		Name:        req.Name,
 		Description: req.Description,
-		Sku:         req.Sku,
+		SKU:         req.SKU,
 		Price:       req.Price,
 		Stock:       req.Stock,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
 
-	// TODO: Save to database
-	r.log.Infof("Product created: %s", product.Id)
+	// TODO: Save entity to database
+	// r.data.db.Create(productEntity)
+	
+	r.log.Infof("Product created: %s", productEntity.ID)
 
-	return product, nil
+	// Convert entity back to DTO
+	return productEntity.ToDTO(), nil
 }
 
-func (r *inventoryRepo) GetProduct(ctx context.Context, id string) (*v1.Product, error) {
-	// TODO: Get from database
-	product := &v1.Product{
-		Id:          id,
+func (r *inventoryRepo) GetProduct(ctx context.Context, id string) (*dto.ProductDTO, error) {
+	// TODO: Get entity from database
+	// var productEntity entity.Product
+	// r.data.db.First(&productEntity, \"id = ?\", id)
+	
+	// Mock entity for now
+	productEntity := &entity.Product{
+		ID:          id,
 		Name:        "Sample Product",
 		Description: "This is a sample product",
-		Sku:         "SKU-001",
+		SKU:         "SKU-001",
 		Price:       99.99,
 		Stock:       100,
-		CreatedAt:   time.Now().Format(time.RFC3339),
-		UpdatedAt:   time.Now().Format(time.RFC3339),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 
-	return product, nil
+	// Convert entity to DTO
+	return productEntity.ToDTO(), nil
 }
 
-func (r *inventoryRepo) ListProducts(ctx context.Context, page, pageSize int32) ([]*v1.Product, int32, error) {
-	// TODO: Get from database with pagination
-	products := []*v1.Product{
+func (r *inventoryRepo) ListProducts(ctx context.Context, query *dto.ListProductsQuery) ([]*dto.ProductDTO, int32, error) {
+	// TODO: Get entities from database with pagination
+	// var entities []entity.Product
+	// r.data.db.Offset(int((query.Page - 1) * query.PageSize)).Limit(int(query.PageSize)).Find(&entities)
+	
+	// Mock entities for now
+	entities := []*entity.Product{
 		{
-			Id:          "1",
+			ID:          "1",
 			Name:        "Product 1",
 			Description: "Description 1",
-			Sku:         "SKU-001",
+			SKU:         "SKU-001",
 			Price:       99.99,
 			Stock:       100,
-			CreatedAt:   time.Now().Format(time.RFC3339),
-			UpdatedAt:   time.Now().Format(time.RFC3339),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
 		},
 		{
-			Id:          "2",
+			ID:          "2",
 			Name:        "Product 2",
 			Description: "Description 2",
-			Sku:         "SKU-002",
+			SKU:         "SKU-002",
 			Price:       149.99,
 			Stock:       50,
-			CreatedAt:   time.Now().Format(time.RFC3339),
-			UpdatedAt:   time.Now().Format(time.RFC3339),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
 		},
 	}
 
-	return products, int32(len(products)), nil
+	// Convert entities to DTOs
+	dtos := make([]*dto.ProductDTO, len(entities))
+	for i, e := range entities {
+		dtos[i] = e.ToDTO()
+	}
+
+	return dtos, int32(len(dtos)), nil
 }
 
-func (r *inventoryRepo) UpdateProduct(ctx context.Context, req *v1.UpdateProductRequest) (*v1.Product, error) {
-	// TODO: Update in database
-	product := &v1.Product{
-		Id:          req.Id,
+func (r *inventoryRepo) UpdateProduct(ctx context.Context, req *dto.UpdateProductDTO) (*dto.ProductDTO, error) {
+	// TODO: Get existing entity from database
+	// var productEntity entity.Product
+	// r.data.db.First(&productEntity, \"id = ?\", req.ID)
+	
+	// Mock entity
+	productEntity := &entity.Product{
+		ID:          req.ID,
 		Name:        req.Name,
 		Description: req.Description,
 		Price:       req.Price,
-		UpdatedAt:   time.Now().Format(time.RFC3339),
+		UpdatedAt:   time.Now(),
 	}
 
-	r.log.Infof("Product updated: %s", product.Id)
+	// TODO: Update entity in database
+	// r.data.db.Save(productEntity)
 
-	return product, nil
+	r.log.Infof("Product updated: %s", productEntity.ID)
+
+	// Convert entity to DTO
+	return productEntity.ToDTO(), nil
 }
 
 func (r *inventoryRepo) DeleteProduct(ctx context.Context, id string) error {
-	// TODO: Delete from database
+	// TODO: Delete entity from database
+	// r.data.db.Delete(&entity.Product{}, \"id = ?\", id)
+	
 	r.log.Infof("Product deleted: %s", id)
 	return nil
 }
 
-func (r *inventoryRepo) UpdateStock(ctx context.Context, id string, quantity int32, operation string) (*v1.Product, error) {
-	// TODO: Update stock in database
-
+func (r *inventoryRepo) UpdateStock(ctx context.Context, req *dto.UpdateStockDTO) (*dto.ProductDTO, error) {
+	// TODO: Get entity from database
+	// var productEntity entity.Product
+	// r.data.db.First(&productEntity, \"id = ?\", req.ID)
+	
+	// Mock current stock
+	currentStock := int32(100)
+	
 	var newStock int32
-	currentStock := int32(100) // Get from database
-
-	switch operation {
+	switch req.Operation {
 	case "add":
-		newStock = currentStock + quantity
+		newStock = currentStock + req.Quantity
 	case "subtract":
-		newStock = currentStock - quantity
+		newStock = currentStock - req.Quantity
 		if newStock < 0 {
 			return nil, fmt.Errorf("insufficient stock")
 		}
 	default:
-		return nil, fmt.Errorf("invalid operation: %s", operation)
+		return nil, fmt.Errorf("invalid operation: %s", req.Operation)
 	}
 
-	product := &v1.Product{
-		Id:        id,
+	// Update entity
+	productEntity := &entity.Product{
+		ID:        req.ID,
 		Stock:     newStock,
-		UpdatedAt: time.Now().Format(time.RFC3339),
+		UpdatedAt: time.Now(),
 	}
 
-	r.log.Infof("Stock updated for product %s: %d -> %d", id, currentStock, newStock)
+	// TODO: Save entity to database
+	// r.data.db.Save(productEntity)
 
-	return product, nil
+	r.log.Infof("Stock updated for product %s: %d -> %d", req.ID, currentStock, newStock)
+
+	// Convert entity to DTO
+	return productEntity.ToDTO(), nil
 }

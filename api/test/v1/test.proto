@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package api.test.v1;
+
+option go_package = "github.com/reverny/kratos-mono/gen/go/api/test/v1;v1";
+
+import "google/api/annotations.proto";
+
+service Test {
+  rpc CreateTest (CreateTestRequest) returns (CreateTestReply) {
+    option (google.api.http) = {
+      post: "/api/v1/test"
+      body: "*"
+    };
+  }
+  rpc GetTest (GetTestRequest) returns (GetTestReply) {
+    option (google.api.http) = {
+      get: "/api/v1/test/{id}"
+    };
+  }
+  rpc ListTest (ListTestRequest) returns (ListTestReply) {
+    option (google.api.http) = {
+      get: "/api/v1/test"
+    };
+  }
+  rpc UpdateTest (UpdateTestRequest) returns (UpdateTestReply) {
+    option (google.api.http) = {
+      put: "/api/v1/test/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteTest (DeleteTestRequest) returns (DeleteTestReply) {
+    option (google.api.http) = {
+      delete: "/api/v1/test/{id}"
+    };
+  }
+}
+
+message TestItem {
+  int64 id = 1;
+  string name = 2;
+}
+
+message CreateTestRequest {
+  string name = 1;
+}
+
+message CreateTestReply {
+  TestItem data = 1;
+}
+
+message GetTestRequest {
+  int64 id = 1;
+}
+
+message GetTestReply {
+  TestItem data = 1;
+}
+
+message ListTestRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListTestReply {
+  repeated TestItem items = 1;
+  int32 total = 2;
+}
+
+message UpdateTestRequest {
+  int64 id = 1;
+  string name = 2;
+}
+
+message UpdateTestReply {
+  TestItem data = 1;
+}
+
+message DeleteTestRequest {
+  int64 id = 1;
+}
+
+message DeleteTestReply {
+  bool success = 1;
+}

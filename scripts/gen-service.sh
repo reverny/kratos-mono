@@ -129,11 +129,14 @@ buf generate api
 echo "Creating service directory structure..."
 mkdir -p "${SERVICE_DIR}/cmd/${SERVICE_NAME}"
 mkdir -p "${SERVICE_DIR}/configs"
+mkdir -p "${SERVICE_DIR}/docs"
 mkdir -p "${SERVICE_DIR}/internal/conf"
 mkdir -p "${SERVICE_DIR}/internal/server"
 mkdir -p "${SERVICE_DIR}/internal/service"
 mkdir -p "${SERVICE_DIR}/internal/biz"
 mkdir -p "${SERVICE_DIR}/internal/data"
+mkdir -p "${SERVICE_DIR}/internal/data/entity"
+mkdir -p "${SERVICE_DIR}/internal/dto"
 
 # Get next available ports (increment by 1 from last service)
 LAST_SERVICE=$(ls -d services/*/ 2>/dev/null | tail -1)
@@ -389,9 +392,9 @@ import (
 	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/conf"
 	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/service"
 
-\t"github.com/go-kratos/kratos/v2/log"
-\t"github.com/go-kratos/kratos/v2/middleware/recovery"
-\t"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/transport/http"
 )
 
 //go:embed swagger.html
@@ -443,6 +446,7 @@ import (
 
 	pb "github.com/reverny/kratos-mono/gen/go/api/${SERVICE_NAME}/v1"
 	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/biz"
+	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/dto"
 )
 
 type ${SERVICE_NAME_UPPER}Service struct {
@@ -456,7 +460,7 @@ func New${SERVICE_NAME_UPPER}Service(uc *biz.${SERVICE_NAME_UPPER}UseCase) *${SE
 }
 
 func (s *${SERVICE_NAME_UPPER}Service) Create${SERVICE_NAME_UPPER}(ctx context.Context, req *pb.Create${SERVICE_NAME_UPPER}Request) (*pb.Create${SERVICE_NAME_UPPER}Reply, error) {
-	item, err := s.uc.Create(ctx, &biz.${SERVICE_NAME_UPPER}{Name: req.Name})
+	item, err := s.uc.Create(ctx, &dto.Create${SERVICE_NAME_UPPER}DTO{Name: req.Name})
 	if err != nil {
 		return nil, err
 	}
@@ -482,7 +486,10 @@ func (s *${SERVICE_NAME_UPPER}Service) Get${SERVICE_NAME_UPPER}(ctx context.Cont
 }
 
 func (s *${SERVICE_NAME_UPPER}Service) List${SERVICE_NAME_UPPER}(ctx context.Context, req *pb.List${SERVICE_NAME_UPPER}Request) (*pb.List${SERVICE_NAME_UPPER}Reply, error) {
-	items, total, err := s.uc.List(ctx, int(req.Page), int(req.PageSize))
+	items, total, err := s.uc.List(ctx, &dto.List${SERVICE_NAME_UPPER}Query{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -502,7 +509,7 @@ func (s *${SERVICE_NAME_UPPER}Service) List${SERVICE_NAME_UPPER}(ctx context.Con
 }
 
 func (s *${SERVICE_NAME_UPPER}Service) Update${SERVICE_NAME_UPPER}(ctx context.Context, req *pb.Update${SERVICE_NAME_UPPER}Request) (*pb.Update${SERVICE_NAME_UPPER}Reply, error) {
-	item, err := s.uc.Update(ctx, &biz.${SERVICE_NAME_UPPER}{
+	item, err := s.uc.Update(ctx, &dto.Update${SERVICE_NAME_UPPER}DTO{
 		ID:   req.Id,
 		Name: req.Name,
 	})
@@ -780,19 +787,16 @@ package biz
 import (
 	"context"
 
+	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/dto"
+
 	"github.com/go-kratos/kratos/v2/log"
 )
 
-type ${SERVICE_NAME_UPPER} struct {
-	ID   int64
-	Name string
-}
-
 type ${SERVICE_NAME_UPPER}Repo interface {
-	Create(context.Context, *${SERVICE_NAME_UPPER}) (*${SERVICE_NAME_UPPER}, error)
-	Get(context.Context, int64) (*${SERVICE_NAME_UPPER}, error)
-	List(context.Context, int, int) ([]*${SERVICE_NAME_UPPER}, int, error)
-	Update(context.Context, *${SERVICE_NAME_UPPER}) (*${SERVICE_NAME_UPPER}, error)
+	Create(context.Context, *dto.Create${SERVICE_NAME_UPPER}DTO) (*dto.${SERVICE_NAME_UPPER}DTO, error)
+	Get(context.Context, int64) (*dto.${SERVICE_NAME_UPPER}DTO, error)
+	List(context.Context, *dto.List${SERVICE_NAME_UPPER}Query) ([]*dto.${SERVICE_NAME_UPPER}DTO, int, error)
+	Update(context.Context, *dto.Update${SERVICE_NAME_UPPER}DTO) (*dto.${SERVICE_NAME_UPPER}DTO, error)
 	Delete(context.Context, int64) error
 }
 
@@ -808,24 +812,24 @@ func New${SERVICE_NAME_UPPER}UseCase(repo ${SERVICE_NAME_UPPER}Repo, logger log.
 	}
 }
 
-func (uc *${SERVICE_NAME_UPPER}UseCase) Create(ctx context.Context, item *${SERVICE_NAME_UPPER}) (*${SERVICE_NAME_UPPER}, error) {
-	uc.log.WithContext(ctx).Infof("Create${SERVICE_NAME_UPPER}: %v", item.Name)
-	return uc.repo.Create(ctx, item)
+func (uc *${SERVICE_NAME_UPPER}UseCase) Create(ctx context.Context, req *dto.Create${SERVICE_NAME_UPPER}DTO) (*dto.${SERVICE_NAME_UPPER}DTO, error) {
+	uc.log.WithContext(ctx).Infof("Create${SERVICE_NAME_UPPER}: %v", req.Name)
+	return uc.repo.Create(ctx, req)
 }
 
-func (uc *${SERVICE_NAME_UPPER}UseCase) Get(ctx context.Context, id int64) (*${SERVICE_NAME_UPPER}, error) {
+func (uc *${SERVICE_NAME_UPPER}UseCase) Get(ctx context.Context, id int64) (*dto.${SERVICE_NAME_UPPER}DTO, error) {
 	uc.log.WithContext(ctx).Infof("Get${SERVICE_NAME_UPPER}: %d", id)
 	return uc.repo.Get(ctx, id)
 }
 
-func (uc *${SERVICE_NAME_UPPER}UseCase) List(ctx context.Context, page, pageSize int) ([]*${SERVICE_NAME_UPPER}, int, error) {
-	uc.log.WithContext(ctx).Infof("List${SERVICE_NAME_UPPER}: page=%d, pageSize=%d", page, pageSize)
-	return uc.repo.List(ctx, page, pageSize)
+func (uc *${SERVICE_NAME_UPPER}UseCase) List(ctx context.Context, query *dto.List${SERVICE_NAME_UPPER}Query) ([]*dto.${SERVICE_NAME_UPPER}DTO, int, error) {
+	uc.log.WithContext(ctx).Infof("List${SERVICE_NAME_UPPER}: page=%d, pageSize=%d", query.Page, query.PageSize)
+	return uc.repo.List(ctx, query)
 }
 
-func (uc *${SERVICE_NAME_UPPER}UseCase) Update(ctx context.Context, item *${SERVICE_NAME_UPPER}) (*${SERVICE_NAME_UPPER}, error) {
-	uc.log.WithContext(ctx).Infof("Update${SERVICE_NAME_UPPER}: %v", item)
-	return uc.repo.Update(ctx, item)
+func (uc *${SERVICE_NAME_UPPER}UseCase) Update(ctx context.Context, req *dto.Update${SERVICE_NAME_UPPER}DTO) (*dto.${SERVICE_NAME_UPPER}DTO, error) {
+	uc.log.WithContext(ctx).Infof("Update${SERVICE_NAME_UPPER}: %v", req)
+	return uc.repo.Update(ctx, req)
 }
 
 func (uc *${SERVICE_NAME_UPPER}UseCase) Delete(ctx context.Context, id int64) error {
@@ -881,40 +885,135 @@ package data
 import (
 	"context"
 
-	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/biz"
+	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/data/entity"
+	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/dto"
 )
 
-func (r *${SERVICE_NAME}Repo) Create(ctx context.Context, item *biz.${SERVICE_NAME_UPPER}) (*biz.${SERVICE_NAME_UPPER}, error) {
+func (r *${SERVICE_NAME}Repo) Create(ctx context.Context, req *dto.Create${SERVICE_NAME_UPPER}DTO) (*dto.${SERVICE_NAME_UPPER}DTO, error) {
 	// TODO: implement database create
-	item.ID = 1
-	return item, nil
+	// Convert CreateDTO to entity
+	ent := &entity.${SERVICE_NAME_UPPER}{
+		Name: req.Name,
+	}
+	
+	// Simulate DB insert
+	ent.ID = 1
+	
+	return ent.ToDTO(), nil
 }
 
-func (r *${SERVICE_NAME}Repo) Get(ctx context.Context, id int64) (*biz.${SERVICE_NAME_UPPER}, error) {
+func (r *${SERVICE_NAME}Repo) Get(ctx context.Context, id int64) (*dto.${SERVICE_NAME_UPPER}DTO, error) {
 	// TODO: implement database get
-	return &biz.${SERVICE_NAME_UPPER}{
+	ent := &entity.${SERVICE_NAME_UPPER}{
 		ID:   id,
 		Name: "sample",
-	}, nil
+	}
+	return ent.ToDTO(), nil
 }
 
-func (r *${SERVICE_NAME}Repo) List(ctx context.Context, page, pageSize int) ([]*biz.${SERVICE_NAME_UPPER}, int, error) {
-	// TODO: implement database list
-	items := []*biz.${SERVICE_NAME_UPPER}{
+func (r *${SERVICE_NAME}Repo) List(ctx context.Context, query *dto.List${SERVICE_NAME_UPPER}Query) ([]*dto.${SERVICE_NAME_UPPER}DTO, int, error) {
+	// TODO: implement database list with pagination
+	entities := []*entity.${SERVICE_NAME_UPPER}{
 		{ID: 1, Name: "sample1"},
 		{ID: 2, Name: "sample2"},
 	}
-	return items, len(items), nil
+	
+	dtos := make([]*dto.${SERVICE_NAME_UPPER}DTO, len(entities))
+	for i, ent := range entities {
+		dtos[i] = ent.ToDTO()
+	}
+	
+	return dtos, len(dtos), nil
 }
 
-func (r *${SERVICE_NAME}Repo) Update(ctx context.Context, item *biz.${SERVICE_NAME_UPPER}) (*biz.${SERVICE_NAME_UPPER}, error) {
+func (r *${SERVICE_NAME}Repo) Update(ctx context.Context, req *dto.Update${SERVICE_NAME_UPPER}DTO) (*dto.${SERVICE_NAME_UPPER}DTO, error) {
 	// TODO: implement database update
-	return item, nil
+	ent := &entity.${SERVICE_NAME_UPPER}{
+		ID:   req.ID,
+		Name: req.Name,
+	}
+	return ent.ToDTO(), nil
 }
 
 func (r *${SERVICE_NAME}Repo) Delete(ctx context.Context, id int64) error {
 	// TODO: implement database delete
 	return nil
+}
+EOF
+
+# Create DTO files
+echo "Creating DTO layer..."
+cat > "${SERVICE_DIR}/internal/dto/${SERVICE_NAME}.go" <<EOF
+package dto
+
+// ${SERVICE_NAME_UPPER}DTO represents data transfer object for business logic layer
+type ${SERVICE_NAME_UPPER}DTO struct {
+	ID   int64
+	Name string
+}
+
+// Create${SERVICE_NAME_UPPER}DTO for creating new ${SERVICE_NAME}
+type Create${SERVICE_NAME_UPPER}DTO struct {
+	Name string
+}
+
+// Update${SERVICE_NAME_UPPER}DTO for updating ${SERVICE_NAME}
+type Update${SERVICE_NAME_UPPER}DTO struct {
+	ID   int64
+	Name string
+}
+
+// List${SERVICE_NAME_UPPER}Query for list query parameters
+type List${SERVICE_NAME_UPPER}Query struct {
+	Page     int32
+	PageSize int32
+}
+EOF
+
+# Create Entity files
+echo "Creating Entity layer..."
+cat > "${SERVICE_DIR}/internal/data/entity/${SERVICE_NAME}.go" <<EOF
+package entity
+
+import (
+	"github.com/reverny/kratos-mono/services/${SERVICE_NAME}/internal/dto"
+)
+
+// ${SERVICE_NAME_UPPER} represents the database entity
+type ${SERVICE_NAME_UPPER} struct {
+	ID   int64
+	Name string
+}
+
+// ToDTO converts entity to DTO
+func (e *${SERVICE_NAME_UPPER}) ToDTO() *dto.${SERVICE_NAME_UPPER}DTO {
+	return &dto.${SERVICE_NAME_UPPER}DTO{
+		ID:   e.ID,
+		Name: e.Name,
+	}
+}
+
+// FromDTO converts DTO to entity
+func FromDTO(d *dto.${SERVICE_NAME_UPPER}DTO) *${SERVICE_NAME_UPPER} {
+	return &${SERVICE_NAME_UPPER}{
+		ID:   d.ID,
+		Name: d.Name,
+	}
+}
+
+// FromCreateDTO converts CreateDTO to entity
+func FromCreateDTO(d *dto.Create${SERVICE_NAME_UPPER}DTO) *${SERVICE_NAME_UPPER} {
+	return &${SERVICE_NAME_UPPER}{
+		Name: d.Name,
+	}
+}
+
+// FromUpdateDTO converts UpdateDTO to entity
+func FromUpdateDTO(d *dto.Update${SERVICE_NAME_UPPER}DTO) *${SERVICE_NAME_UPPER} {
+	return &${SERVICE_NAME_UPPER}{
+		ID:   d.ID,
+		Name: d.Name,
+	}
 }
 EOF
 
