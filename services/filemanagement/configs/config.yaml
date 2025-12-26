@@ -1,0 +1,25 @@
+server:
+  http:
+    addr: 0.0.0.0:8005
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:9005
+    timeout: 1s
+data:
+  database:
+    driver: mysql
+    source: root:root@tcp(127.0.0.1:3306)/filemanagement?charset=utf8mb4&parseTime=True&loc=Local
+  redis:
+    addr: 127.0.0.1:6379
+    read_timeout: 0.2s
+    write_timeout: 0.2s
+storage:
+  type: local  # local, minio, s3
+  base_url: http://localhost:8005/files
+  upload_path: ./uploads
+  # MinIO/S3 configuration (for production)
+  # endpoint: localhost:9000
+  # access_key: minioadmin
+  # secret_key: minioadmin
+  # bucket: files
+  # use_ssl: false

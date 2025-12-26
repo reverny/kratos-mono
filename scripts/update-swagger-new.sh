@@ -62,6 +62,68 @@ spec_file = sys.argv[2]
 with open(spec_file, 'r') as f:
     new_spec = json.load(f)
 
+# Define custom endpoints to preserve (not from proto)
+custom_endpoints = {
+    "/api/v1/test/upload": {
+        "post": {
+            "summary": "Upload file (multipart/form-data)",
+            "description": "Upload file using multipart/form-data. This endpoint provides better UX than base64 JSON.",
+            "operationId": "UploadFileMultipart",
+            "consumes": ["multipart/form-data"],
+            "produces": ["application/json"],
+            "parameters": [
+                {
+                    "name": "file",
+                    "in": "formData",
+                    "description": "File to upload",
+                    "required": True,
+                    "type": "file"
+                },
+                {
+                    "name": "description",
+                    "in": "formData",
+                    "description": "File description (optional)",
+                    "required": False,
+                    "type": "string"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "File uploaded successfully",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "integer", "format": "int64"},
+                            "file_name": {"type": "string"},
+                            "content_type": {"type": "string"},
+                            "size": {"type": "integer", "format": "int64"},
+                            "url": {"type": "string"},
+                            "message": {"type": "string"}
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad request",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "error": {"type": "string"}
+                        }
+                    }
+                }
+            },
+            "tags": ["Test"]
+        }
+    }
+}
+
+# Merge custom endpoints if this is the test service
+if 'test' in spec_file:
+    if 'paths' not in new_spec:
+        new_spec['paths'] = {}
+    for path, methods in custom_endpoints.items():
+        new_spec['paths'][path] = methods
+
 # Read current HTML
 with open(html_file, 'r') as f:
     content = f.read()

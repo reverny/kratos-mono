@@ -8,7 +8,7 @@ import (
 	"github.com/google/wire"
 )
 
-var ProviderSet = wire.NewSet(NewData, NewTestRepo)
+var ProviderSet = wire.NewSet(NewData, NewTestRepo, NewFileStorage)
 
 type Data struct {
 	log *log.Helper
@@ -33,4 +33,11 @@ func NewTestRepo(data *Data, logger log.Logger) biz.TestRepo {
 		data: data,
 		log:  log.NewHelper(logger),
 	}
+}
+
+// NewFileStorage creates a new file storage instance
+func NewFileStorage(c *conf.Data) biz.FileStorage {
+	// For development, use local storage
+	// In production, replace with MinIOStorage or S3Storage
+	return NewLocalFileStorage("http://localhost:8002/files", "./uploads")
 }

@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package api.filemanagement.v1;
+
+option go_package = "github.com/reverny/kratos-mono/gen/go/api/filemanagement/v1;v1";
+
+import "google/api/annotations.proto";
+
+service Filemanagement {
+  // Request presigned URL for file upload
+  rpc RequestUploadUrl (RequestUploadUrlRequest) returns (RequestUploadUrlReply) {
+    option (google.api.http) = {
+      post: "/api/v1/files/upload/request"
+      body: "*"
+    };
+  }
+  
+  // Confirm file upload (optional verification)
+  rpc ConfirmUpload (ConfirmUploadRequest) returns (ConfirmUploadReply) {
+    option (google.api.http) = {
+      post: "/api/v1/files/upload/confirm"
+      body: "*"
+    };
+  }
+  
+  // Get file metadata and download URL
+  rpc GetFileInfo (GetFileInfoRequest) returns (GetFileInfoReply) {
+    option (google.api.http) = {
+      get: "/api/v1/files/{file_id}"
+    };
+  }
+  
+  // Delete file
+  rpc DeleteFile (DeleteFileRequest) returns (DeleteFileReply) {
+    option (google.api.http) = {
+      delete: "/api/v1/files/{file_id}"
+    };
+  }
+}
+
+// Request presigned URL for upload
+message RequestUploadUrlRequest {
+  string file_name = 1;
+  string content_type = 2;
+  int64 file_size = 3;
+  string description = 4;
+}
+
+message RequestUploadUrlReply {
+  string file_id = 1;
+  string upload_url = 2;
+  string download_url = 3;
+  string method = 4; // HTTP method (usually PUT)
+  map<string, string> headers = 5;
+  int64 expires_in = 6; // seconds
+}
+
+// Confirm upload
+message ConfirmUploadRequest {
+  string file_id = 1;
+}
+
+message ConfirmUploadReply {
+  bool success = 1;
+  string file_url = 2;
+  string message = 3;
+}
+
+// Get file info
+message GetFileInfoRequest {
+  string file_id = 1;
+}
+
+message GetFileInfoReply {
+  string file_id = 1;
+  string file_name = 2;
+  string file_url = 3;
+  string content_type = 4;
+  int64 file_size = 5;
+  string description = 6;
+  int64 created_at = 7;
+}
+
+// Delete file
+message DeleteFileRequest {
+  string file_id = 1;
+}
+
+message DeleteFileReply {
+  bool success = 1;
+  string message = 2;
+}

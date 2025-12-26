@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	pb "github.com/reverny/kratos-mono/gen/go/api/test/v1"
 	"github.com/reverny/kratos-mono/services/test/internal/biz"
@@ -11,11 +12,15 @@ import (
 type TestService struct {
 	pb.UnimplementedTestServer
 
-	uc *biz.TestUseCase
+	uc         *biz.TestUseCase
+	fileUpload *biz.FileUploadUseCase
 }
 
-func NewTestService(uc *biz.TestUseCase) *TestService {
-	return &TestService{uc: uc}
+func NewTestService(uc *biz.TestUseCase, fileUpload *biz.FileUploadUseCase) *TestService {
+	return &TestService{
+		uc:         uc,
+		fileUpload: fileUpload,
+	}
 }
 
 func (s *TestService) CreateTest(ctx context.Context, req *pb.CreateTestRequest) (*pb.CreateTestReply, error) {
@@ -89,4 +94,54 @@ func (s *TestService) DeleteTest(ctx context.Context, req *pb.DeleteTestRequest)
 		return nil, err
 	}
 	return &pb.DeleteTestReply{Success: true}, nil
+}
+
+// RequestFileUpload generates presigned URL for file upload
+func (s *TestService) RequestFileUpload(ctx context.Context, req *pb.RequestFileUploadRequest) (*pb.UploadUrlReply, error) {
+	// Validate request
+	if req.FileName == "" {
+		return nil, fmt.Errorf("file name is required")
+	}
+	if req.ContentType == "" {
+		return nil, fmt.Errorf("content type is required")
+	}
+	
+	// Request upload URL from use case
+	metadata, urlInfo, err := s.fileUpload.RequestUpload(
+		ctx,
+		req.FileName,
+		req.ContentType,
+		req.FileSize,
+		req.Description,
+	)
+	if err != nil {
+		return nil, err
+	}
+	
+	return &pb.UploadUrlReply{
+		FileId:      metadata.FileID,
+		UploadUrl:   urlInfo.UploadURL,
+		DownloadUrl: urlInfo.DownloadURL,
+		ExpiresIn:   urlInfo.ExpiresIn,
+		Method:      urlInfo.Method,
+		Headers:     urlInfo.Headers,
+	}, nil
+}
+
+// ConfirmFileUpload confirms that file was uploaded successfully
+func (s *TestService) ConfirmFileUpload(ctx context.Context, req *pb.ConfirmFileUploadRequest) (*pb.ConfirmFileUploadReply, error) {
+	if req.FileId == "" {
+		return nil, fmt.Errorf("file ID is required")
+	}
+	
+	fileURL, err := s.fileUpload.ConfirmUpload(ctx, req.FileId)
+	if err != nil {
+		return nil, err
+	}
+	
+	return &pb.ConfirmFileUploadReply{
+		Success: true,
+		FileUrl: fileURL,
+		Message: "File upload confirmed successfully",
+	}, nil
 }

@@ -26,3 +26,12 @@ message Pagination {
   int32 page_size = 2;
   int32 total = 3;
 }
+
+// File upload/download data
+message FileData {
+  string file_name = 1; // ชื่อไฟล์ เช่น "document.pdf"
+  string content_type = 2; // MIME type เช่น "image/png", "application/pdf"
+  bytes data = 3; // ข้อมูลไฟล์แบบ binary
+  int64 size = 4; // ขนาดไฟล์ (bytes) - optional
+  string url = 5; // URL ของไฟล์ (ถ้าเก็บแยก) - optional
+}

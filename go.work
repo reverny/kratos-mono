@@ -2,6 +2,7 @@ go 1.23.0
 
 use (
 	.
+	./services/filemanagement
 	./services/inventory
 	./services/product
 	./services/test

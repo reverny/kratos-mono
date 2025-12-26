@@ -1,0 +1,398 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "test/v1/test.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Test"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/test": {
+      "get": {
+        "operationId": "ListTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTestReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      },
+      "post": {
+        "operationId": "CreateTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateTestReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateTestRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      }
+    },
+    "/api/v1/test/file": {
+      "post": {
+        "operationId": "UploadFile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UploadFileReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UploadFileRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      }
+    },
+    "/api/v1/test/{id}": {
+      "get": {
+        "operationId": "GetTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetTestReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteTestReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateTestReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestUpdateTestBody"
+            }
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "TestUpdateTestBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "file": {
+          "$ref": "#/definitions/commonFileData"
+        }
+      }
+    },
+    "commonFileData": {
+      "type": "object",
+      "properties": {
+        "fileName": {
+          "type": "string",
+          "title": "ชื่อไฟล์ เช่น \"document.pdf\""
+        },
+        "contentType": {
+          "type": "string",
+          "title": "MIME type เช่น \"image/png\", \"application/pdf\""
+        },
+        "data": {
+          "type": "string",
+          "format": "byte",
+          "title": "ข้อมูลไฟล์แบบ binary"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "title": "ขนาดไฟล์ (bytes) - optional"
+        },
+        "url": {
+          "type": "string",
+          "title": "URL ของไฟล์ (ถ้าเก็บแยก) - optional"
+        }
+      },
+      "title": "File upload/download data"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateTestReply": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/v1TestItem"
+        }
+      }
+    },
+    "v1CreateTestRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "file": {
+          "$ref": "#/definitions/commonFileData"
+        }
+      }
+    },
+    "v1DeleteTestReply": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1GetTestReply": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/v1TestItem"
+        }
+      }
+    },
+    "v1ListTestReply": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TestItem"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1TestItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "file": {
+          "$ref": "#/definitions/commonFileData",
+          "title": "ใช้ common.FileData"
+        }
+      }
+    },
+    "v1UpdateTestReply": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/v1TestItem"
+        }
+      }
+    },
+    "v1UploadFileReply": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "contentType": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "int64"
+        },
+        "url": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UploadFileRequest": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "$ref": "#/definitions/commonFileData"
+        },
+        "description": {
+          "type": "string",
+          "title": "คำอธิบายไฟล์ (optional)"
+        }
+      }
+    }
+  }
+}

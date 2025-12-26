@@ -5,6 +5,7 @@ package api.test.v1;
 option go_package = "github.com/reverny/kratos-mono/gen/go/api/test/v1;v1";
 
 import "google/api/annotations.proto";
+import "common/common.proto";
 
 service Test {
   rpc CreateTest (CreateTestRequest) returns (CreateTestReply) {
@@ -34,15 +35,34 @@ service Test {
       delete: "/api/v1/test/{id}"
     };
   }
+  
+  // File upload workflow - Step 1: Request upload permission
+  rpc RequestFileUpload (RequestFileUploadRequest) returns (UploadUrlReply) {
+    option (google.api.http) = {
+      post: "/api/v1/test/files/upload-url"
+      body: "*"
+    };
+  }
+  
+  // File upload workflow - Step 2 (Optional): Confirm upload completion
+  rpc ConfirmFileUpload (ConfirmFileUploadRequest) returns (ConfirmFileUploadReply) {
+    option (google.api.http) = {
+      post: "/api/v1/test/files/confirm"
+      body: "*"
+    };
+  }
 }
 
 message TestItem {
   int64 id = 1;
   string name = 2;
+  string file_url = 3; // URL ของไฟล์ที่ upload แล้ว
+  string file_name = 4; // ชื่อไฟล์
 }
 
 message CreateTestRequest {
   string name = 1;
+  string file_id = 2; // ID จาก RequestFileUpload (optional)
 }
 
 message CreateTestReply {
@@ -70,6 +90,7 @@ message ListTestReply {
 message UpdateTestRequest {
   int64 id = 1;
   string name = 2;
+  string file_id = 3; // ID จาก RequestFileUpload (optional)
 }
 
 message UpdateTestReply {
@@ -82,4 +103,33 @@ message DeleteTestRequest {
 
 message DeleteTestReply {
   bool success = 1;
+}
+
+// Request presigned URL for file upload
+message RequestFileUploadRequest {
+  string file_name = 1; // ชื่อไฟล์ต้นฉบับ
+  string content_type = 2; // MIME type (e.g., "image/png", "application/pdf")
+  int64 file_size = 3; // ขนาดไฟล์ (bytes)
+  string description = 4; // คำอธิบาย (optional)
+}
+
+// Presigned URL response
+message UploadUrlReply {
+  string file_id = 1; // ID สำหรับอ้างอิงไฟล์
+  string upload_url = 2; // Presigned URL สำหรับ upload (PUT request)
+  string download_url = 3; // URL สำหรับดาวน์โหลด (หลัง upload สำเร็จ)
+  int64 expires_in = 4; // URL หมดอายุใน (seconds)
+  string method = 5; // HTTP method (usually "PUT")
+  map<string, string> headers = 6; // Headers ที่ต้องส่งไปกับ upload request
+}
+
+// Confirm upload completion (optional)
+message ConfirmFileUploadRequest {
+  string file_id = 1;
+}
+
+message ConfirmFileUploadReply {
+  bool success = 1;
+  string file_url = 2;
+  string message = 3;
 }

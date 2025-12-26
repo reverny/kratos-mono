@@ -19,197 +19,531 @@
         window.onload = function() {
             SwaggerUIBundle({
                 spec: {
-                    openapi: '3.0.3',
-                    info: {
-                        title: 'Test Service API',
-                        version: '1.0.0',
-                        description: 'Test service API documentation'
-                    },
-                    servers: [
-                        { url: window.location.origin, description: 'Current Server' }
-                    ],
-                    paths: {
-                        '/api/v1/Test': {
-                            get: {
-                                tags: ['Test'],
-                                summary: 'List items',
-                                operationId: 'ListTest',
-                                parameters: [
-                                    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
-                                    { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
-                                ],
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/ListTestReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            post: {
-                                tags: ['Test'],
-                                summary: 'Create item',
-                                operationId: 'CreateTest',
-                                requestBody: {
-                                    required: true,
-                                    content: {
-                                        'application/json': {
-                                            schema: { $ref: '#/components/schemas/CreateTestRequest' }
-                                        }
-                                    }
-                                },
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/CreateTestReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        '/api/v1/Test/{id}': {
-                            get: {
-                                tags: ['Test'],
-                                summary: 'Get item',
-                                operationId: 'GetTest',
-                                parameters: [
-                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
-                                ],
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/GetTestReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            put: {
-                                tags: ['Test'],
-                                summary: 'Update item',
-                                operationId: 'UpdateTest',
-                                parameters: [
-                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
-                                ],
-                                requestBody: {
-                                    required: true,
-                                    content: {
-                                        'application/json': {
-                                            schema: { $ref: '#/components/schemas/UpdateTestRequest' }
-                                        }
-                                    }
-                                },
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/UpdateTestReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            delete: {
-                                tags: ['Test'],
-                                summary: 'Delete item',
-                                operationId: 'DeleteTest',
-                                parameters: [
-                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
-                                ],
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/DeleteTestReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    components: {
-                        schemas: {
-                            TestItem: {
-                                type: 'object',
-                                properties: {
-                                    id: { type: 'integer', format: 'int64' },
-                                    name: { type: 'string' }
-                                }
-                            },
-                            CreateTestRequest: {
-                                type: 'object',
-                                required: ['name'],
-                                properties: {
-                                    name: { type: 'string' }
-                                }
-                            },
-                            CreateTestReply: {
-                                type: 'object',
-                                properties: {
-                                    data: { $ref: '#/components/schemas/TestItem' }
-                                }
-                            },
-                            GetTestReply: {
-                                type: 'object',
-                                properties: {
-                                    data: { $ref: '#/components/schemas/TestItem' }
-                                }
-                            },
-                            ListTestReply: {
-                                type: 'object',
-                                properties: {
-                                    items: {
-                                        type: 'array',
-                                        items: { $ref: '#/components/schemas/TestItem' }
-                                    },
-                                    total: { type: 'integer', format: 'int32' }
-                                }
-                            },
-                            UpdateTestRequest: {
-                                type: 'object',
-                                properties: {
-                                    name: { type: 'string' }
-                                }
-                            },
-                            UpdateTestReply: {
-                                type: 'object',
-                                properties: {
-                                    data: { $ref: '#/components/schemas/TestItem' }
-                                }
-                            },
-                            DeleteTestReply: {
-                                type: 'object',
-                                properties: {
-                                    success: { type: 'boolean' }
-                                }
-                            }
-                        },
-                        securitySchemes: {
-                            BearerAuth: {
-                                type: 'http',
-                                scheme: 'bearer',
-                                bearerFormat: 'JWT',
-                                description: 'Enter your Bearer token in the format: Bearer <token>'
-                            }
-                        }
-                    },
-                    security: [
-                        {
-                            BearerAuth: []
-                        }
-                    ]
+  "swagger": "2.0",
+  "info": {
+    "title": "test/v1/test.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Test"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/test": {
+      "get": {
+        "operationId": "ListTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTestReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      },
+      "post": {
+        "operationId": "CreateTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateTestReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateTestRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      }
+    },
+    "/api/v1/test/files/confirm": {
+      "post": {
+        "summary": "File upload workflow - Step 2 (Optional): Confirm upload completion",
+        "operationId": "ConfirmFileUpload",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ConfirmFileUploadReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ConfirmFileUploadRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      }
+    },
+    "/api/v1/test/files/upload-url": {
+      "post": {
+        "summary": "File upload workflow - Step 1: Request upload permission",
+        "operationId": "RequestFileUpload",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UploadUrlReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RequestFileUploadRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      }
+    },
+    "/api/v1/test/{id}": {
+      "get": {
+        "operationId": "GetTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetTestReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteTestReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateTest",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateTestReply"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TestUpdateTestBody"
+            }
+          }
+        ],
+        "tags": [
+          "Test"
+        ]
+      }
+    },
+    "/api/v1/test/upload": {
+      "post": {
+        "summary": "Upload file (multipart/form-data)",
+        "description": "Upload file using multipart/form-data. This endpoint provides better UX than base64 JSON.",
+        "operationId": "UploadFileMultipart",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "File to upload",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "description": "File description (optional)",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File uploaded successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "format": "int64"
                 },
+                "file_name": {
+                  "type": "string"
+                },
+                "content_type": {
+                  "type": "string"
+                },
+                "size": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "TestUpdateTestBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "fileId": {
+          "type": "string",
+          "title": "ID \u0e08\u0e32\u0e01 RequestFileUpload (optional)"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ConfirmFileUploadReply": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "fileUrl": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ConfirmFileUploadRequest": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "type": "string"
+        }
+      },
+      "title": "Confirm upload completion (optional)"
+    },
+    "v1CreateTestReply": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/v1TestItem"
+        }
+      }
+    },
+    "v1CreateTestRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "fileId": {
+          "type": "string",
+          "title": "ID \u0e08\u0e32\u0e01 RequestFileUpload (optional)"
+        }
+      }
+    },
+    "v1DeleteTestReply": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1GetTestReply": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/v1TestItem"
+        }
+      }
+    },
+    "v1ListTestReply": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TestItem"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1RequestFileUploadRequest": {
+      "type": "object",
+      "properties": {
+        "fileName": {
+          "type": "string",
+          "title": "\u0e0a\u0e37\u0e48\u0e2d\u0e44\u0e1f\u0e25\u0e4c\u0e15\u0e49\u0e19\u0e09\u0e1a\u0e31\u0e1a"
+        },
+        "contentType": {
+          "type": "string",
+          "title": "MIME type (e.g., \"image/png\", \"application/pdf\")"
+        },
+        "fileSize": {
+          "type": "string",
+          "format": "int64",
+          "title": "\u0e02\u0e19\u0e32\u0e14\u0e44\u0e1f\u0e25\u0e4c (bytes)"
+        },
+        "description": {
+          "type": "string",
+          "title": "\u0e04\u0e33\u0e2d\u0e18\u0e34\u0e1a\u0e32\u0e22 (optional)"
+        }
+      },
+      "title": "Request presigned URL for file upload"
+    },
+    "v1TestItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "fileUrl": {
+          "type": "string",
+          "title": "URL \u0e02\u0e2d\u0e07\u0e44\u0e1f\u0e25\u0e4c\u0e17\u0e35\u0e48 upload \u0e41\u0e25\u0e49\u0e27"
+        },
+        "fileName": {
+          "type": "string",
+          "title": "\u0e0a\u0e37\u0e48\u0e2d\u0e44\u0e1f\u0e25\u0e4c"
+        }
+      }
+    },
+    "v1UpdateTestReply": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/v1TestItem"
+        }
+      }
+    },
+    "v1UploadUrlReply": {
+      "type": "object",
+      "properties": {
+        "fileId": {
+          "type": "string",
+          "title": "ID \u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e2d\u0e49\u0e32\u0e07\u0e2d\u0e34\u0e07\u0e44\u0e1f\u0e25\u0e4c"
+        },
+        "uploadUrl": {
+          "type": "string",
+          "title": "Presigned URL \u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a upload (PUT request)"
+        },
+        "downloadUrl": {
+          "type": "string",
+          "title": "URL \u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e14\u0e32\u0e27\u0e19\u0e4c\u0e42\u0e2b\u0e25\u0e14 (\u0e2b\u0e25\u0e31\u0e07 upload \u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08)"
+        },
+        "expiresIn": {
+          "type": "string",
+          "format": "int64",
+          "title": "URL \u0e2b\u0e21\u0e14\u0e2d\u0e32\u0e22\u0e38\u0e43\u0e19 (seconds)"
+        },
+        "method": {
+          "type": "string",
+          "title": "HTTP method (usually \"PUT\")"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Headers \u0e17\u0e35\u0e48\u0e15\u0e49\u0e2d\u0e07\u0e2a\u0e48\u0e07\u0e44\u0e1b\u0e01\u0e31\u0e1a upload request"
+        }
+      },
+      "title": "Presigned URL response"
+    }
+  }
+},
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [

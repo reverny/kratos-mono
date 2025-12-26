@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/go-kratos/kratos/v2 v2.8.2
 	github.com/google/uuid v1.6.0
-	github.com/google/wire v0.6.0
+	github.com/google/wire v0.7.0
 	github.com/reverny/kratos-mono v0.0.0-00010101000000-000000000000
 	google.golang.org/protobuf v1.35.2
 )
