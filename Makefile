@@ -5,6 +5,7 @@ SERVICES := $(shell find services -maxdepth 1 -type d ! -path services -exec bas
 ROOT_DIR := $(shell pwd)
 API_PROTO_FILES := $(shell find api -name "*.proto")
 SWAGGER_PORT := 8080
+VERSION := 0.1.0
 
 help: ## Show this help message
 	@echo 'Usage:'
