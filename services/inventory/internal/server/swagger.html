@@ -19,248 +19,361 @@
         window.onload = function() {
             SwaggerUIBundle({
                 spec: {
-                    openapi: '3.0.3',
-                    info: {
-                        title: 'Inventory Service API',
-                        version: '1.0.0',
-                        description: 'Product inventory management API'
-                    },
-                    servers: [
-                        { url: window.location.origin, description: 'Current Server' }
-                    ],
-                    paths: {
-                        '/api/v1/inventory': {
-                            get: {
-                                tags: ['Inventory'],
-                                summary: 'List products',
-                                operationId: 'ListProducts',
-                                parameters: [
-                                    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
-                                    { name: 'page_size', in: 'query', schema: { type: 'integer', default: 10 } }
-                                ],
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/ListProductsReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            post: {
-                                tags: ['Inventory'],
-                                summary: 'Create product',
-                                operationId: 'CreateProduct',
-                                requestBody: {
-                                    required: true,
-                                    content: {
-                                        'application/json': {
-                                            schema: { $ref: '#/components/schemas/CreateProductRequest' }
-                                        }
-                                    }
-                                },
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/CreateProductReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        '/api/v1/inventory/{id}': {
-                            get: {
-                                tags: ['Inventory'],
-                                summary: 'Get product',
-                                operationId: 'GetProduct',
-                                parameters: [
-                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
-                                ],
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/GetProductReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            put: {
-                                tags: ['Inventory'],
-                                summary: 'Update product',
-                                operationId: 'UpdateProduct',
-                                parameters: [
-                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
-                                ],
-                                requestBody: {
-                                    required: true,
-                                    content: {
-                                        'application/json': {
-                                            schema: { $ref: '#/components/schemas/UpdateProductRequest' }
-                                        }
-                                    }
-                                },
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/UpdateProductReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            delete: {
-                                tags: ['Inventory'],
-                                summary: 'Delete product',
-                                operationId: 'DeleteProduct',
-                                parameters: [
-                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
-                                ],
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/DeleteProductReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        '/api/v1/inventory/{id}/stock': {
-                            put: {
-                                tags: ['Inventory'],
-                                summary: 'Update product stock',
-                                operationId: 'UpdateStock',
-                                parameters: [
-                                    { name: 'id', in: 'path', required: true, schema: { type: 'integer', format: 'int64' } }
-                                ],
-                                requestBody: {
-                                    required: true,
-                                    content: {
-                                        'application/json': {
-                                            schema: { $ref: '#/components/schemas/UpdateStockRequest' }
-                                        }
-                                    }
-                                },
-                                responses: {
-                                    '200': {
-                                        description: 'Success',
-                                        content: {
-                                            'application/json': {
-                                                schema: { $ref: '#/components/schemas/UpdateStockReply' }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    components: {
-                        schemas: {
-                            ProductItem: {
-                                type: 'object',
-                                properties: {
-                                    id: { type: 'integer', format: 'int64' },
-                                    name: { type: 'string' },
-                                    description: { type: 'string' },
-                                    price: { type: 'number', format: 'double' },
-                                    stock: { type: 'integer', format: 'int32' }
-                                }
-                            },
-                            CreateProductRequest: {
-                                type: 'object',
-                                required: ['name'],
-                                properties: {
-                                    name: { type: 'string' },
-                                    description: { type: 'string' },
-                                    price: { type: 'number', format: 'double' },
-                                    stock: { type: 'integer', format: 'int32' }
-                                }
-                            },
-                            CreateProductReply: {
-                                type: 'object',
-                                properties: {
-                                    data: { $ref: '#/components/schemas/ProductItem' }
-                                }
-                            },
-                            GetProductReply: {
-                                type: 'object',
-                                properties: {
-                                    data: { $ref: '#/components/schemas/ProductItem' }
-                                }
-                            },
-                            ListProductsReply: {
-                                type: 'object',
-                                properties: {
-                                    items: {
-                                        type: 'array',
-                                        items: { $ref: '#/components/schemas/ProductItem' }
-                                    },
-                                    total: { type: 'integer', format: 'int32' }
-                                }
-                            },
-                            UpdateProductRequest: {
-                                type: 'object',
-                                properties: {
-                                    name: { type: 'string' },
-                                    description: { type: 'string' },
-                                    price: { type: 'number', format: 'double' }
-                                }
-                            },
-                            UpdateProductReply: {
-                                type: 'object',
-                                properties: {
-                                    data: { $ref: '#/components/schemas/ProductItem' }
-                                }
-                            },
-                            DeleteProductReply: {
-                                type: 'object',
-                                properties: {
-                                    success: { type: 'boolean' }
-                                }
-                            },
-                            UpdateStockRequest: {
-                                type: 'object',
-                                required: ['quantity'],
-                                properties: {
-                                    quantity: { type: 'integer', format: 'int32' }
-                                }
-                            },
-                            UpdateStockReply: {
-                                type: 'object',
-                                properties: {
-                                    data: { $ref: '#/components/schemas/ProductItem' }
-                                }
-                            }
-                        },
-                        securitySchemes: {
-                            BearerAuth: {
-                                type: 'http',
-                                scheme: 'bearer',
-                                bearerFormat: 'JWT',
-                                description: 'Enter your Bearer token in the format: Bearer <token>'
-                            }
-                        }
-                    },
-                    security: [
-                        {
-                            BearerAuth: []
-                        }
-                    ]
-                },
+  "swagger": "2.0",
+  "info": {
+    "title": "inventory/v1/inventory.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Inventory"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/products": {
+      "get": {
+        "summary": "\u0e14\u0e36\u0e07\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14",
+        "operationId": "ListProducts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListProductsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "Inventory"
+        ]
+      },
+      "post": {
+        "summary": "\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e43\u0e2b\u0e21\u0e48",
+        "operationId": "CreateProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Product"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateProductRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Inventory"
+        ]
+      }
+    },
+    "/v1/products/{id}": {
+      "get": {
+        "summary": "\u0e14\u0e36\u0e07\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32",
+        "operationId": "GetProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Product"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Inventory"
+        ]
+      },
+      "delete": {
+        "summary": "\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32",
+        "operationId": "DeleteProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Inventory"
+        ]
+      },
+      "put": {
+        "summary": "\u0e2d\u0e31\u0e1e\u0e40\u0e14\u0e17\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32",
+        "operationId": "UpdateProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Product"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/InventoryUpdateProductBody"
+            }
+          }
+        ],
+        "tags": [
+          "Inventory"
+        ]
+      }
+    },
+    "/v1/products/{id}/stock": {
+      "patch": {
+        "summary": "\u0e2d\u0e31\u0e1e\u0e40\u0e14\u0e17\u0e08\u0e33\u0e19\u0e27\u0e19\u0e2a\u0e15\u0e47\u0e2d\u0e01",
+        "operationId": "UpdateStock",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Product"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/InventoryUpdateStockBody"
+            }
+          }
+        ],
+        "tags": [
+          "Inventory"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "InventoryUpdateProductBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "InventoryUpdateStockBody": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "operation": {
+          "type": "string",
+          "title": "\"add\" or \"subtract\""
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateProductRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "sku": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number",
+          "format": "double"
+        },
+        "stock": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ListProductsResponse": {
+      "type": "object",
+      "properties": {
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Product"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Product": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "sku": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number",
+          "format": "double"
+        },
+        "stock": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "title": "Product model"
+    }
+  }
+},
                 dom_id: '#swagger-ui',
-                deepLinking: true,
                 presets: [
                     SwaggerUIBundle.presets.apis,
                     SwaggerUIStandalonePreset

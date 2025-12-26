@@ -18,8 +18,9 @@ plugins:
     out: gen/go/api
     opt:
       - paths=source_relative
-  - local: protoc-gen-openapi
+  - local: protoc-gen-openapiv2
     out: gen/openapi
     opt:
-      - naming=proto
-      - depth=2
+      - output_format=json
+      - allow_merge=false
+      - simple_operation_ids=true

@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# Update Swagger documentation from proto files
+# This script:
+# 1. Parses proto files directly
+# 2. Generates OpenAPI specs using Python
+# 3. Updates swagger.html files for each service
+
+set -e
+
+ROOT_DIR=$(pwd)
+
+# Function to get proto file for a service
+get_proto_file() {
+    case "$1" in
+        inventory)
+            echo "api/inventory/v1/inventory.proto"
+            ;;
+        user)
+            echo "api/user/v1/user.proto"
+            ;;
+        product)
+            echo "api/product/v1/product.proto"
+            ;;
+        *)
+            echo ""
+            ;;
+    esac
+}
+
+# Function to update swagger HTML for a service
+update_service_swagger() {
+    local service_name=$1
+    local service_dir="services/${service_name}"
+    local swagger_html="${service_dir}/internal/server/swagger.html"
+    local proto_file=$(get_proto_file "${service_name}")
+    
+    if [ ! -f "${swagger_html}" ]; then
+        echo "⚠️  Warning: ${swagger_html} not found, skipping ${service_name}"
+        return
+    fi
+    
+    if [ ! -f "${proto_file}" ]; then
+        echo "⚠️  Warning: ${proto_file} not found, skipping ${service_name}"
+        return
+    fi
+    
+    echo "📝 Updating swagger for ${service_name} from ${proto_file}..."
+    
+    # Generate OpenAPI spec from proto file and update HTML in one Python script
+    temp_file=$(python3 - <<PYEOF
+import sys
+import re
+sys.path.insert(0, 'scripts')
+
+# Import the proto-to-swagger functionality
+import subprocess
+result = subprocess.run(
+    ['python3', 'scripts/proto-to-swagger.py', '${proto_file}', '${service_name}'],
+    capture_output=True,
+    text=True
+)
+
+if result.returncode != 0:
+    print(f"Error generating spec: {result.stderr}", file=sys.stderr)
+    sys.exit(1)
+
+spec_json = result.stdout
+
+# Read current swagger HTML
+with open('${swagger_html}', 'r') as f:
+    content = f.read()
+
+# Find and replace the spec object
+# Match: spec: { ... } with nested braces
+pattern = r'spec:\s*\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\}'
+
+# Create new spec string
+new_spec = f'spec: {spec_json.strip()}'
+
+# Replace
+content = re.sub(pattern, new_spec, content, count=1)
+
+# Write to temp file first
+import tempfile
+with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.html') as f:
+    f.write(content)
+    temp_path = f.name
+
+print(temp_path)
+PYEOF
+)
+    
+    if [ -n "${temp_file}" ] && [ -f "${temp_file}" ]; then
+            # Backup original
+            cp "${swagger_html}" "${swagger_html}.bak"
+            
+            # Replace with updated version
+            mv "${temp_file}" "${swagger_html}"
+            
+            # Also update the docs/ version
+            cp "${swagger_html}" "${service_dir}/docs/swagger.html"
+            
+            echo "✅ Updated ${service_name} swagger"
+        else
+            echo "❌ Failed to update ${service_name} swagger"
+        fi
+
+echo "🎉 Swagger update complete!"
+echo "💡 Remember to rebuild your services to embed the updated swagger:"
+echo "   make build"

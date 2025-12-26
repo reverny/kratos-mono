@@ -39,10 +39,13 @@ service Product {
 message ProductItem {
   int64 id = 1;
   string name = 2;
+  string sku = 3;
 }
 
 message CreateProductRequest {
   string name = 1;
+  string sku = 2;
+  string url = 3;
 }
 
 message CreateProductReply {

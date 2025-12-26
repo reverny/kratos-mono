@@ -1,7 +1,7 @@
 .PHONY: all api build test clean lint help wire run-inventory swagger
 
 # Variables
-SERVICES := inventory user product
+SERVICES := $(shell find services -maxdepth 1 -type d ! -path services -exec basename {} \; | sort)
 ROOT_DIR := $(shell pwd)
 API_PROTO_FILES := $(shell find api -name "*.proto")
 SWAGGER_PORT := 8080
@@ -71,7 +71,7 @@ stop-%: ## Stop a specific service (e.g., make stop-inventory)
 	@pkill -f "$*.*-conf" || true
 
 # ===== Swagger/OpenAPI =====
-.PHONY: swagger swagger-serve
+.PHONY: swagger swagger-serve update-swagger
 swagger: api ## Generate and serve Swagger UI documentation
 	@echo "Opening Swagger UI..."
 	@echo "Swagger UI available at: http://localhost:$(SWAGGER_PORT)"
@@ -83,6 +83,9 @@ swagger-serve: ## Serve Swagger UI without regenerating
 	@echo "Swagger UI available at: http://localhost:$(SWAGGER_PORT)/docs/swagger/"
 	@open http://localhost:$(SWAGGER_PORT)/docs/swagger/ || true
 	@cd docs/swagger && python3 -m http.server $(SWAGGER_PORT)
+
+update-swagger: ## Update swagger specs from proto files for all services
+	@bash scripts/update-swagger-new.sh
 
 # ===== Test =====
 .PHONY: test test-coverage
